@@ -3,6 +3,7 @@ package com.example.warehouse.service.implementation;
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.exception.UserNotFoundException;
+import com.example.warehouse.model.Role;
 import com.example.warehouse.model.User;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.UserService;
@@ -10,6 +11,8 @@ import com.sun.jdi.InternalException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -18,6 +21,10 @@ import java.util.List;
 @Service
 public class UserServiceImplementation implements UserService {
 
+    public PasswordEncoder passwordEncoder()
+    {
+        return new BCryptPasswordEncoder();
+    }
     ModelMapper modelMapper = new ModelMapper();
     @Autowired
     UserRepository userRepository;
@@ -25,6 +32,8 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void createUser(NewUserDTO newUserDTO) {
         User newUser = modelMapper.map(newUserDTO, User.class);
+        newUser.setRole(Role.USER);
+        newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
         userRepository.save(newUser);
     }
 
@@ -59,6 +68,11 @@ public class UserServiceImplementation implements UserService {
             userRepository.deleteById(id);
         }
         else throw new UserNotFoundException("ID: " + id);
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
 }

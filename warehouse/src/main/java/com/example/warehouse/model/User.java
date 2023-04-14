@@ -22,5 +22,6 @@ public class User {
     private LocalDate dateOfBirth;
     private String avatarPath;
     private boolean enabled;
+    private Role role;
 
 }

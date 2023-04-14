@@ -1,5 +1,6 @@
 package com.example.warehouse.dto;
 
+import com.example.warehouse.model.Role;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -17,4 +18,5 @@ public class UserDTO {
     private LocalDate dateOfBirth;
     private String avatarPath;
     private boolean enabled;
+    private Role role;
 }

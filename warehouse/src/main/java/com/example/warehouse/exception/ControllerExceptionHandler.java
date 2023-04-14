@@ -23,6 +23,7 @@ public class ControllerExceptionHandler {
     }
 
     // General Exceptions Handling
+    /*
     @ExceptionHandler(value = {
             HttpServerErrorException.InternalServerError.class,
             NullPointerException.class,
@@ -32,6 +33,8 @@ public class ControllerExceptionHandler {
         return new ErrorMessage(500, new Date(), ex.getMessage(),
                 "Oops! There seems to be an error... Please try again later.");
     }
+     */
+
 
     // Database Exceptions Handling
     @ExceptionHandler(value = {
