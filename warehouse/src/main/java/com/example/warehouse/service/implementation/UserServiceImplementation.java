@@ -2,9 +2,11 @@ package com.example.warehouse.service.implementation;
 
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
+import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.User;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.UserService;
+import com.sun.jdi.InternalException;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +23,15 @@ public class UserServiceImplementation implements UserService {
     UserRepository userRepository;
 
     @Override
-    public boolean createUser(NewUserDTO newUserDTO) {
+    public void createUser(NewUserDTO newUserDTO) {
         User newUser = modelMapper.map(newUserDTO, User.class);
-        try{
-            userRepository.save(newUser);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
+        userRepository.save(newUser);
     }
 
     @Override
     public UserDTO findUserById(int id) {
-        return modelMapper.map(userRepository.findById(id), UserDTO.class);
+        return modelMapper.map(userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("ID: " + id)), UserDTO.class);
     }
 
     @Override
@@ -42,31 +40,25 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public boolean updateUser(UserDTO userDTO) {
-        User editUser = userRepository.findById(userDTO.getId()).orElse(null);
-        if(editUser == null)
-            return false;
+    public void updateUser(UserDTO userDTO) {
+        User editUser = userRepository.findById(userDTO.getId())
+                .orElseThrow(() -> new UserNotFoundException("User Not Found"));
 
         editUser.setDateOfBirth(userDTO.getDateOfBirth());
         editUser.setBiography(userDTO.getBiography());
         editUser.setInterests(userDTO.getInterests());
         editUser.setName(userDTO.getName());
 
-        try{
-            userRepository.save(editUser);
-            return true;
-        }catch(Exception e){
-            return false;
-        }
+        userRepository.save(editUser);
+
     }
 
     @Override
-    public boolean deleteUser(int id) {
-        try{
+    public void deleteUser(int id) {
+        if(userRepository.existsById(id)){
             userRepository.deleteById(id);
-            return true;
-        } catch (Exception e){
-            return false;
         }
+        else throw new UserNotFoundException("ID: " + id);
     }
+
 }
