@@ -1,6 +1,5 @@
 package com.example.warehouse.model.helper;
 
-import com.example.warehouse.model.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

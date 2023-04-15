@@ -1,9 +1,7 @@
 package com.example.warehouse.security.config;
 
 import com.example.warehouse.security.authentication.JwtAuthenticationFilter;
-import com.example.warehouse.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
