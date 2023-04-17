@@ -15,17 +15,19 @@ public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
     private String role;
+    private boolean enabled;
 
-    public CustomUserDetails (String username, String password, String role){
+    public CustomUserDetails (String username, String password, String role, boolean enabled){
         this.username = username;
         this.password = password;
         this.role = role;
+        this.enabled = enabled;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        String authority = "";
+        String authority;
         if(role.equals("USER"))
             authority = "ROLE_USER";
         else authority = "ROLE_ADMIN";
@@ -62,10 +64,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
-    public String getRole(){
-        return role;
-    }
 }

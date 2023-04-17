@@ -50,4 +50,10 @@ public class UserController {
        userService.deleteUser(id);
        return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/enable/{id}")
+    public ResponseEntity<?> enableUser(@PathVariable int id){
+        userService.enableUser(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -2,7 +2,9 @@ package com.example.warehouse.service.implementation;
 
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
+import com.example.warehouse.exception.UserEmailExistsException;
 import com.example.warehouse.exception.UserNotFoundException;
+import com.example.warehouse.exception.UserUsernameExistsException;
 import com.example.warehouse.model.Role;
 import com.example.warehouse.model.User;
 import com.example.warehouse.repository.UserRepository;
@@ -31,9 +33,22 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void createUser(NewUserDTO newUserDTO) {
         User newUser = modelMapper.map(newUserDTO, User.class);
+        validate(newUser);
         newUser.setRole(Role.USER);
+        newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
+        //TODO: Create verification Token and send Email
         userRepository.save(newUser);
+    }
+
+    private void validate(User user){
+
+        if(userRepository.findByUsername(user.getUsername()) != null)
+            throw new UserUsernameExistsException("Username: " + user.getUsername());
+
+        if(userRepository.findByEmail(user.getEmail()) != null)
+            throw new UserEmailExistsException("E-mail: " + user.getEmail());
+
     }
 
     @Override
@@ -66,7 +81,7 @@ public class UserServiceImplementation implements UserService {
         if(userRepository.existsById(id)){
             userRepository.deleteById(id);
         }
-        else throw new UserNotFoundException("ID: " + id);
+        else throw new UserNotFoundException("Id: " + id);
     }
 
     @Override
@@ -74,4 +89,10 @@ public class UserServiceImplementation implements UserService {
         return userRepository.findByUsername(username);
     }
 
+    @Override
+    public void enableUser(int id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Id: " + id));
+        user.setEnabled(true);
+        userRepository.save(user);
+    }
 }
