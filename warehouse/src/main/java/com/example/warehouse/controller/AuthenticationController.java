@@ -3,6 +3,7 @@ package com.example.warehouse.controller;
 import com.example.warehouse.security.authentication.AuthenticationRequest;
 import com.example.warehouse.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

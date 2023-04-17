@@ -7,8 +7,11 @@ import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.exception.UserUsernameExistsException;
 import com.example.warehouse.model.Role;
 import com.example.warehouse.model.User;
+import com.example.warehouse.model.VerificationToken;
 import com.example.warehouse.repository.UserRepository;
+import com.example.warehouse.repository.VerificationTokenRepository;
 import com.example.warehouse.service.UserService;
+import com.example.warehouse.service.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -29,6 +32,7 @@ public class UserServiceImplementation implements UserService {
     }
     ModelMapper modelMapper = new ModelMapper();
     private final UserRepository userRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
 
     @Override
     public void createUser(NewUserDTO newUserDTO) {
@@ -37,8 +41,9 @@ public class UserServiceImplementation implements UserService {
         newUser.setRole(Role.USER);
         newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
-        //TODO: Create verification Token and send Email
         userRepository.save(newUser);
+        //TODO: Create verification Token and send Email
+        verificationTokenRepository.save(new VerificationToken(findUserByUsername(newUser.getUsername()).getId()));
     }
 
     private void validate(User user){
