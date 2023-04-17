@@ -3,6 +3,7 @@ package com.example.warehouse.controller;
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.service.UserService;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody NewUserDTO userDTO){
+    public ResponseEntity<?> createUser(@RequestBody NewUserDTO userDTO) {
         userService.createUser(userDTO);
         return new ResponseEntity<>(HttpStatus.OK);
     }

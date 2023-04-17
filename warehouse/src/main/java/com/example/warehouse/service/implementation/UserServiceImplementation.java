@@ -10,6 +10,7 @@ import com.example.warehouse.model.User;
 import com.example.warehouse.model.VerificationToken;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.repository.VerificationTokenRepository;
+import com.example.warehouse.service.EmailService;
 import com.example.warehouse.service.UserService;
 import com.example.warehouse.service.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +34,20 @@ public class UserServiceImplementation implements UserService {
     ModelMapper modelMapper = new ModelMapper();
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final EmailService emailService;
 
     @Override
-    public void createUser(NewUserDTO newUserDTO) {
+    public void createUser(NewUserDTO newUserDTO){
         User newUser = modelMapper.map(newUserDTO, User.class);
         validate(newUser);
         newUser.setRole(Role.USER);
         newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
         userRepository.save(newUser);
-        //TODO: Create verification Token and send Email
-        verificationTokenRepository.save(new VerificationToken(findUserByUsername(newUser.getUsername()).getId()));
+        int userId = findUserByUsername(newUser.getUsername()).getId();
+        verificationTokenRepository.save(new VerificationToken(userId));
+        emailService.sendVerificationEmail(newUser.getEmail(),
+                verificationTokenRepository.findByUserId(userId).getId().toString());
     }
 
     private void validate(User user){

@@ -3,6 +3,7 @@ package com.example.warehouse.service;
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.model.User;
+import jakarta.mail.MessagingException;
 
 import java.util.List;
 
