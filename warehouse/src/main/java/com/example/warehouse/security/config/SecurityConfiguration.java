@@ -22,10 +22,12 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors()
+                .and()
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/api/user/**", "/api/auth/**", "/api/token/**")
+                .requestMatchers("/api/user/**", "/api/auth/**", "/api/token/**", "/api/asset/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
