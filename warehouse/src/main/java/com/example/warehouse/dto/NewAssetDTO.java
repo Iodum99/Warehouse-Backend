@@ -14,6 +14,4 @@ public class NewAssetDTO {
     private String name;
     private String description;
     private AssetType assetType;
-    private byte[] image;
-
 }
