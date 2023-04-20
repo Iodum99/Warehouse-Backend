@@ -53,10 +53,19 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public void updateAsset(AssetDTO assetDTO) {
-        Asset asset = assetRepository.findById(assetDTO.getId())
-                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + assetDTO.getId()));
-
+    public void updateAsset(AssetDTO assetDTO, MultipartFile file, MultipartFile image) {
+        Asset asset = modelMapper.map(assetDTO, Asset.class);
+        try{
+            if(image != null)
+                asset.setImage(image.getBytes());
+            if(file != null){
+                Files.write(Path.of(assetDTO.getFilePath()), file.getBytes());
+            }
+            asset.setLastModifiedDate(LocalDate.now());
+            assetRepository.save(asset);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

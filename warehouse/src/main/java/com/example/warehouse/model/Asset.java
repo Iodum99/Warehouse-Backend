@@ -20,4 +20,5 @@ public class Asset {
     private byte[] image;
     private AssetType assetType;
     private LocalDate uploadDate;
+    private LocalDate lastModifiedDate;
 }

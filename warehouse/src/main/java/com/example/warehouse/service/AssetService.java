@@ -8,6 +8,6 @@ public interface AssetService {
 
     void createAsset(NewAssetDTO newAsset, MultipartFile file, MultipartFile image);
     AssetDTO findAssetById(int id);
-    void updateAsset(AssetDTO asset);
+    void updateAsset(AssetDTO asset, MultipartFile file, MultipartFile image);
     void deleteAsset(int id);
 }

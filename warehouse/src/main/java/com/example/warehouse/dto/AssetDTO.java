@@ -17,4 +17,5 @@ public class AssetDTO {
     private byte[] image;
     private AssetType assetType;
     private LocalDate uploadDate;
+    private LocalDate lastModifiedDate;
 }
