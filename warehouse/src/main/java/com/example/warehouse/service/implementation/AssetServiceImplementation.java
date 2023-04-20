@@ -23,20 +23,18 @@ public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
     private final UserService userService;
+    private static final String directoryPath = System.getProperty("user.dir") + "/assets/user_id_";
     ModelMapper modelMapper = new ModelMapper();
     @Override
     public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image) {
         Asset asset = modelMapper.map(newAssetDTO, Asset.class);
         asset.setUploadDate(LocalDate.now());
-        String path = System.getProperty("user.dir") + "/assets/user_id_" +
-                newAssetDTO.getUserId()
-                + "/" +
-                file.getName() + ".zip";
+        String path = directoryPath + newAssetDTO.getUserId() + "/" + file.getName() + ".zip";
         try{
-            asset.setImage(image.getBytes());
-            asset.setFilePath(path);
-            assetRepository.save(asset);
             Files.write(Path.of(path), file.getBytes());
+            asset.setFilePath(path);
+            asset.setImage(image.getBytes());
+            assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
         }
