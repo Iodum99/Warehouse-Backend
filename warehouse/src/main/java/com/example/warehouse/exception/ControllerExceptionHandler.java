@@ -77,4 +77,13 @@ public class ControllerExceptionHandler {
         return new ErrorMessage(498, new Date(), "Token expired",
                 ex.getLocalizedMessage());
     }
+
+    // Asset Exceptions Handling
+    @ExceptionHandler(AssetNotFoundException.class)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    public ErrorMessage AssetNotFoundException(AssetNotFoundException ex){
+        ex.printStackTrace();
+        return new ErrorMessage(404, new Date(), "Asset not found",
+                ex.getLocalizedMessage());
+    }
 }

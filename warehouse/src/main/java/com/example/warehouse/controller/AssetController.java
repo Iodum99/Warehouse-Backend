@@ -30,4 +30,10 @@ public class AssetController {
     public ResponseEntity<?> getAssetById(@PathVariable int id){
         return new ResponseEntity<>(assetService.findAssetById(id), HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteAssetById(@PathVariable int id){
+        assetService.deleteAsset(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

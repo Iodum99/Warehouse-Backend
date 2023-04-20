@@ -122,7 +122,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void initialize() {
         createUser(new NewUserDTO("Admin", "123", "test1@email.com"));
-        createUser(new NewUserDTO("Test2", "123", "test2@email.com"));
+        createUser(new NewUserDTO("Decla", "123", "test2@email.com"));
         createUser(new NewUserDTO("Test3", "123", "test3@email.com"));
         createUser(new NewUserDTO("Test4", "123", "test4@email.com"));
     }
