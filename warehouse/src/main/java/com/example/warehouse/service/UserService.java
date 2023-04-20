@@ -16,4 +16,6 @@ public interface UserService {
     void deleteUser(int id);
     User findUserByUsername(String username);
     void enableUser(int id);
+
+    void initialize();
 }

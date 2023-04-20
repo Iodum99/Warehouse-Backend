@@ -50,12 +50,10 @@ public class UserServiceImplementation implements UserService {
         newUser.setRole(Role.USER);
         newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
-        userRepository.save(newUser);
-        int userId = findUserByUsername(newUser.getUsername()).getId();
-        verificationTokenRepository.save(new VerificationToken(userId));
-        emailService.sendVerificationEmail(newUser.getEmail(),
-                verificationTokenRepository.findByUserId(userId).getId().toString());
-        createUserDirectory(userId);
+        User createdUser = userRepository.save(newUser);
+        VerificationToken createdToken = verificationTokenRepository.save(new VerificationToken(createdUser.getId()));
+        emailService.sendVerificationEmail(newUser.getEmail(), createdToken.getId().toString());
+        createUserDirectory(createdUser.getId());
     }
 
     private void validate(User user){
@@ -119,5 +117,13 @@ public class UserServiceImplementation implements UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Id: " + id));
         user.setEnabled(true);
         userRepository.save(user);
+    }
+
+    @Override
+    public void initialize() {
+        createUser(new NewUserDTO("Admin", "123", "test1@email.com"));
+        createUser(new NewUserDTO("Test2", "123", "test2@email.com"));
+        createUser(new NewUserDTO("Test3", "123", "test3@email.com"));
+        createUser(new NewUserDTO("Test4", "123", "test4@email.com"));
     }
 }
