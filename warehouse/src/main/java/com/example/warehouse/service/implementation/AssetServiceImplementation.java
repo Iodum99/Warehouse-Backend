@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 
 
@@ -25,15 +28,18 @@ public class AssetServiceImplementation implements AssetService {
     public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image) {
         Asset asset = modelMapper.map(newAssetDTO, Asset.class);
         asset.setUploadDate(LocalDate.now());
-
+        String path = System.getProperty("user.dir") + "/assets/user_id_" +
+                newAssetDTO.getUserId()
+                + "/" +
+                file.getName() + ".zip";
         try{
             asset.setImage(image.getBytes());
+            asset.setFilePath(path);
             assetRepository.save(asset);
-            //TODO: Save File and store its path
+            Files.write(Path.of(path), file.getBytes());
         } catch (Exception e){
             e.printStackTrace();
         }
-
     }
 
     @Override

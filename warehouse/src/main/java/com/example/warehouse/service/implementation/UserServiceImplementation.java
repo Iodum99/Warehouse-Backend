@@ -13,14 +13,20 @@ import com.example.warehouse.repository.VerificationTokenRepository;
 import com.example.warehouse.service.EmailService;
 import com.example.warehouse.service.UserService;
 import com.example.warehouse.service.VerificationTokenService;
+import jakarta.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @Service
@@ -35,6 +41,7 @@ public class UserServiceImplementation implements UserService {
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
     private final EmailService emailService;
+    private final ServletContext context;
 
     @Override
     public void createUser(NewUserDTO newUserDTO){
@@ -48,6 +55,7 @@ public class UserServiceImplementation implements UserService {
         verificationTokenRepository.save(new VerificationToken(userId));
         emailService.sendVerificationEmail(newUser.getEmail(),
                 verificationTokenRepository.findByUserId(userId).getId().toString());
+        createUserDirectory(userId);
     }
 
     private void validate(User user){
@@ -58,6 +66,14 @@ public class UserServiceImplementation implements UserService {
         if(userRepository.findByEmail(user.getEmail()) != null)
             throw new UserEmailExistsException("E-mail: " + user.getEmail());
 
+    }
+
+    private void createUserDirectory(int id) {
+        try {
+            Files.createDirectories(Paths.get(System.getProperty("user.dir") + "/assets/user_id_" + id));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
