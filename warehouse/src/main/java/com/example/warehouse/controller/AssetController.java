@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "/api/asset")
 @CrossOrigin("http://localhost:4200")
@@ -23,8 +25,9 @@ public class AssetController {
     public ResponseEntity<?> createAsset(
             @RequestPart("asset") NewAssetDTO newAssetDTO,
             @RequestPart("file") MultipartFile file,
-            @RequestPart("image") MultipartFile image){
-        assetService.createAsset(newAssetDTO, file, image);
+            @RequestPart("image") MultipartFile image,
+            @RequestPart("gallery") List<MultipartFile> gallery){
+        assetService.createAsset(newAssetDTO, file, image, gallery);
         return new ResponseEntity<>(HttpStatus.OK);
     }
     @GetMapping("/{id}")
@@ -42,8 +45,9 @@ public class AssetController {
     public ResponseEntity<?> updateAsset(
             @RequestPart("asset") AssetDTO assetDTO,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestPart(value = "image", required = false) MultipartFile image){
-        assetService.updateAsset(assetDTO, file, image);
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery){
+        assetService.updateAsset(assetDTO, file, image, gallery);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

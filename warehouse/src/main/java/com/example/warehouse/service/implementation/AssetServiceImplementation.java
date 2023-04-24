@@ -3,10 +3,8 @@ package com.example.warehouse.service.implementation;
 import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
-import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
 import com.example.warehouse.repository.AssetRepository;
-import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.AssetService;
 import com.example.warehouse.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -29,12 +29,14 @@ public class AssetServiceImplementation implements AssetService {
     private static final String directoryPath = System.getProperty("user.dir") + "/assets/user_id_";
     ModelMapper modelMapper = new ModelMapper();
     @Override
-    public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image) {
+    public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
         Asset asset = modelMapper.map(newAssetDTO, Asset.class);
         asset.setUploadDate(LocalDate.now());
         String author = userService.findUserById(newAssetDTO.getUserId()).getUsername();
         String path = directoryPath + newAssetDTO.getUserId() + "/" + author + "_" + newAssetDTO.getName() + ".zip";
         try{
+            if(gallery != null)
+                asset.setGallery(getByteArrayForGallery(gallery));
             Files.write(Path.of(path), file.getBytes());
             asset.setFilePath(path);
             asset.setImage(image.getBytes());
@@ -44,24 +46,37 @@ public class AssetServiceImplementation implements AssetService {
         }
     }
 
-    @Override
-    public AssetDTO findAssetById(int id) {
-        AssetDTO asset = modelMapper.map(assetRepository.findById(id)
-                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + id)), AssetDTO.class);
-        asset.setAuthor(userService.findUserById(id).getUsername());
-        return asset;
+    private List<byte[]> getByteArrayForGallery(List<MultipartFile> gallery) throws IOException {
+        List<byte[]> galleryBytes = new ArrayList<>();
+        for(MultipartFile image: gallery)
+            galleryBytes.add(image.getBytes());
+
+        return galleryBytes;
     }
 
     @Override
-    public void updateAsset(AssetDTO assetDTO, MultipartFile file, MultipartFile image) {
-        Asset asset = modelMapper.map(assetDTO, Asset.class);
+    public AssetDTO findAssetById(int id) {
+        Asset asset = assetRepository.findById(id)
+                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + id));
+        AssetDTO assetDTO = modelMapper.map(asset, AssetDTO.class);
+        assetDTO.setAuthor(userService.findUserById(id).getUsername());
+        return assetDTO;
+    }
+
+    @Override
+    public void updateAsset(AssetDTO assetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
+        Asset asset = assetRepository.findById(assetDTO.getId())
+                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + assetDTO.getId()));
+        asset.setName(assetDTO.getName());
+        asset.setDescription(asset.getDescription());
+        asset.setLastModifiedDate(LocalDate.now());
         try{
             if(image != null)
                 asset.setImage(image.getBytes());
-            if(file != null){
+            if(file != null)
                 Files.write(Path.of(assetDTO.getFilePath()), file.getBytes());
-            }
-            asset.setLastModifiedDate(LocalDate.now());
+            if(gallery != null)
+                asset.setGallery(getByteArrayForGallery(gallery));
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();

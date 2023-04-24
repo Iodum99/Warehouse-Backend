@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "asset_table")
@@ -18,6 +19,8 @@ public class Asset {
     private String description;
     private String filePath;
     private byte[] image;
+    @ElementCollection
+    private List<byte[]> gallery;
     private AssetType assetType;
     private LocalDate uploadDate;
     private LocalDate lastModifiedDate;
