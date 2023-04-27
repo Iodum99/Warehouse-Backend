@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -26,8 +27,10 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<?> updateUser(@RequestBody UserDTO userDTO){
-        userService.updateUser(userDTO);
+    public ResponseEntity<?> updateUser(
+            @RequestPart("user") UserDTO userDTO,
+            @RequestPart(value = "image", required = false) MultipartFile image){
+        userService.updateUser(userDTO, image);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

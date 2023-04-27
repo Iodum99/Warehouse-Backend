@@ -13,10 +13,13 @@ public class UserDTO {
     private String password;
     private String email;
     private String name;
+    private String surname;
     private String biography;
     private String interests;
+    private String country;
     private LocalDate dateOfBirth;
-    private String avatarPath;
+    private LocalDate joinDate;
+    private byte[] avatar;
     private boolean enabled;
     private Role role;
 }
