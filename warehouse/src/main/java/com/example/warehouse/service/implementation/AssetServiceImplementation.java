@@ -6,6 +6,7 @@ import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
 import com.example.warehouse.model.Asset;
+import com.example.warehouse.model.User;
 import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.service.AssetService;
 import com.example.warehouse.service.UserService;
@@ -15,6 +16,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,8 +37,8 @@ public class AssetServiceImplementation implements AssetService {
     public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
         Asset asset = modelMapper.map(newAssetDTO, Asset.class);
         asset.setUploadDate(LocalDate.now());
-        String author = userService.findUserById(newAssetDTO.getUserId()).getUsername();
-        String path = directoryPath + newAssetDTO.getUserId() + "/" + author + "_" + newAssetDTO.getName() + ".zip";
+        User author = userService.findUserByUsername(newAssetDTO.getAuthor());
+        String path = directoryPath + author.getId() + "/" + author.getUsername() + "_" + newAssetDTO.getName().replace(" ","_") + ".zip";
         try{
             if(gallery != null)
                 asset.setGallery(getByteArrayForGallery(gallery));
@@ -61,9 +63,7 @@ public class AssetServiceImplementation implements AssetService {
     public AssetDTO findAssetById(int id) {
         Asset asset = assetRepository.findById(id)
                 .orElseThrow(() -> new AssetNotFoundException("AssetId: " + id));
-        AssetDTO assetDTO = modelMapper.map(asset, AssetDTO.class);
-        assetDTO.setAuthor(userService.findUserById(id).getUsername());
-        return assetDTO;
+        return modelMapper.map(asset, AssetDTO.class);
     }
 
     @Override
@@ -76,14 +76,24 @@ public class AssetServiceImplementation implements AssetService {
         try{
             if(image != null)
                 asset.setImage(image.getBytes());
-            if(file != null)
-                Files.write(Path.of(assetDTO.getFilePath()), file.getBytes());
+            if(file != null){
+                renameFileOnAssetUpdate(asset, assetDTO.getName(), file);
+            }
             if(gallery != null)
                 asset.setGallery(getByteArrayForGallery(gallery));
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void renameFileOnAssetUpdate(Asset asset, String name, MultipartFile file) throws IOException {
+        User author = userService.findUserByUsername(asset.getAuthor());
+        File originalFile = new File(asset.getFilePath());
+        String path = directoryPath + author.getId() + "/" + author.getUsername() + "_" + name.replace(" ","_") + ".zip";
+        File newFile = new File(path);
+        if(originalFile.renameTo(newFile))
+            Files.write(Path.of(path), file.getBytes());
     }
 
     @Override
@@ -104,8 +114,8 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public List<AssetListViewDTO> findAllAssetsByUserId(int id) {
-git s        return modelMapper
-                .map(assetRepository.findAllByUserId(id), new TypeToken<List<AssetListViewDTO>>(){}.getType());
+    public List<AssetListViewDTO> findAllAssetsByAuthor(String author) {
+        return modelMapper
+                .map(assetRepository.findAllByAuthorContainingIgnoreCase(author), new TypeToken<List<AssetListViewDTO>>(){}.getType());
     }
 }

@@ -60,14 +60,11 @@ public class UserServiceImplementation implements UserService {
     }
 
     private void validate(User user){
-
-        //TODO: Query to check existence regardless of upper/lower case
-        if(userRepository.findByUsername(user.getUsername()) != null)
+        if(userRepository.findByUsernameContainingIgnoreCase(user.getUsername()).isPresent())
             throw new UserUsernameExistsException("Username: " + user.getUsername());
 
-        if(userRepository.findByEmail(user.getEmail()) != null)
+        if(userRepository.findByEmailContainingIgnoreCase(user.getEmail()).isPresent())
             throw new UserEmailExistsException("E-mail: " + user.getEmail());
-
     }
 
     private void createUserDirectory(int id) {
@@ -124,7 +121,8 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameContainingIgnoreCase(username)
+                .orElseThrow(() -> new UserNotFoundException("Username: " + username));
     }
 
     @Override

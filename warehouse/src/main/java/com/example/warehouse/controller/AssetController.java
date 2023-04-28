@@ -51,9 +51,9 @@ public class AssetController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getAllAssetsByUserId(@PathVariable int id){
-        return new ResponseEntity<>(assetService.findAllAssetsByUserId(id), HttpStatus.OK);
+    @GetMapping("/user/{author}")
+    public ResponseEntity<?> getAllAssetsByUserId(@PathVariable String author){
+        return new ResponseEntity<>(assetService.findAllAssetsByAuthor(author), HttpStatus.OK);
     }
 
     @GetMapping

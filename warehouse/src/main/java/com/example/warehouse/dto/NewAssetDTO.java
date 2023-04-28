@@ -10,7 +10,7 @@ import java.io.File;
 @Data
 public class NewAssetDTO {
 
-    private int userId;
+    private String author;
     private String name;
     private String description;
     private AssetType assetType;
