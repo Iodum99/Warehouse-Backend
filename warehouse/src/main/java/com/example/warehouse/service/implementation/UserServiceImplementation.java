@@ -145,7 +145,7 @@ public class UserServiceImplementation implements UserService {
                     img,Role.ADMIN, LocalDate.of(2023, 1, 1));
             User user2 = new User(
                     "Delca",passwordEncoder().encode("USERsifra123"), "delca@gmail.com", "Delca", "Britt",
-                    "I am an introvert boy, born in late 1998!", "Graphics design, binging series",
+                    "I am an introvert boy, born in late 1998! (Lie, I was born befire Christ and dinsaurs were my pets. I am the cause of the Big Bang, oops!)", "Graphics design, binging series, Eurovision and in free time I like to pretend I am the Qeen Elizabeth!",
                     "France", LocalDate.of(1998, 11, 26),
                     img,Role.USER, LocalDate.of(2023, 1, 2));
 
