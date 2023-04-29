@@ -16,4 +16,5 @@ public interface AssetService {
 
     List<AssetListViewDTO> findAllAssets();
     List<AssetListViewDTO> findAllAssetsByUserId(int id);
+    List<AssetListViewDTO> findAllAssetsByType(String type);
 }

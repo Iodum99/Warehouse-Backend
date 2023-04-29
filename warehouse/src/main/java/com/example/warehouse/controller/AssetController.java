@@ -30,7 +30,7 @@ public class AssetController {
         assetService.createAsset(newAssetDTO, file, image, gallery);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    @GetMapping("/{id}")
+    @GetMapping("/item/{id}")
     public ResponseEntity<?> getAssetById(@PathVariable int id){
         return new ResponseEntity<>(assetService.findAssetById(id), HttpStatus.OK);
     }
@@ -59,5 +59,10 @@ public class AssetController {
     @GetMapping
     public ResponseEntity<?> getAllAssets(){
         return new ResponseEntity<>(assetService.findAllAssets(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{type}")
+    public ResponseEntity<?> getAllAssetsByType(@PathVariable String type){
+        return new ResponseEntity<>(assetService.findAllAssetsByType(type), HttpStatus.OK);
     }
 }

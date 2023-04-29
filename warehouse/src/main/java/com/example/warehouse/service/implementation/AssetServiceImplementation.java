@@ -7,6 +7,7 @@ import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
 import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
+import com.example.warehouse.model.AssetType;
 import com.example.warehouse.model.User;
 import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
@@ -125,5 +126,12 @@ public class AssetServiceImplementation implements AssetService {
     public List<AssetListViewDTO> findAllAssetsByUserId(int userId) {
         return modelMapper
                 .map(assetRepository.findAllByUserId(userId), new TypeToken<List<AssetListViewDTO>>(){}.getType());
+    }
+
+    @Override
+    public List<AssetListViewDTO> findAllAssetsByType(String type) {
+       return modelMapper
+                .map(assetRepository.findAllByAssetType(AssetType.valueOf(type)),
+                        new TypeToken<List<AssetListViewDTO>>(){}.getType());
     }
 }

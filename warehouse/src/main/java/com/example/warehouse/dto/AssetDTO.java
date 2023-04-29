@@ -16,6 +16,7 @@ public class AssetDTO {
     private String description;
     private String filePath;
     private byte[] image;
+    private byte[] thumbnail;
     private List<byte[]> gallery;
     private AssetType assetType;
     private LocalDate uploadDate;
