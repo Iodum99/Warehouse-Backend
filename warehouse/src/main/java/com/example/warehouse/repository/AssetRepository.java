@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface AssetRepository extends JpaRepository<Asset, Integer> {
 
-    List<Asset> findAllByAuthorContainingIgnoreCase(String author);
+    List<Asset> findAllByUserId(int userId);
 }

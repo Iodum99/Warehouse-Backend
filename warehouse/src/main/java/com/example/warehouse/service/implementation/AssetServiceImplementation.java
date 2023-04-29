@@ -5,14 +5,17 @@ import com.example.warehouse.dto.AssetListViewDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
+import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
 import com.example.warehouse.model.User;
 import com.example.warehouse.repository.AssetRepository;
+import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.AssetService;
 import com.example.warehouse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,14 +33,17 @@ import java.util.List;
 public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private static final String directoryPath = System.getProperty("user.dir") + "/assets/user_id_";
     ModelMapper modelMapper = new ModelMapper();
     @Override
     public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Asset asset = modelMapper.map(newAssetDTO, Asset.class);
+        User author = userRepository.findById(newAssetDTO.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("UserId: " + newAssetDTO.getUserId()));
+        asset.setAuthor(author.getUsername());
         asset.setUploadDate(LocalDate.now());
-        User author = userService.findUserByUsername(newAssetDTO.getAuthor());
         String path = directoryPath + author.getId() + "/" + author.getUsername() + "_" + newAssetDTO.getName().replace(" ","_") + ".zip";
         try{
             if(gallery != null)
@@ -68,6 +74,7 @@ public class AssetServiceImplementation implements AssetService {
 
     @Override
     public void updateAsset(AssetDTO assetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Asset asset = assetRepository.findById(assetDTO.getId())
                 .orElseThrow(() -> new AssetNotFoundException("AssetId: " + assetDTO.getId()));
         asset.setName(assetDTO.getName());
@@ -88,7 +95,8 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     private void renameFileOnAssetUpdate(Asset asset, String name, MultipartFile file) throws IOException {
-        User author = userService.findUserByUsername(asset.getAuthor());
+        User author = userRepository.findById(asset.getUserId())
+                .orElseThrow(() -> new UserNotFoundException("UserId: " + asset.getUserId()));
         File originalFile = new File(asset.getFilePath());
         String path = directoryPath + author.getId() + "/" + author.getUsername() + "_" + name.replace(" ","_") + ".zip";
         File newFile = new File(path);
@@ -114,8 +122,8 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public List<AssetListViewDTO> findAllAssetsByAuthor(String author) {
+    public List<AssetListViewDTO> findAllAssetsByUserId(int userId) {
         return modelMapper
-                .map(assetRepository.findAllByAuthorContainingIgnoreCase(author), new TypeToken<List<AssetListViewDTO>>(){}.getType());
+                .map(assetRepository.findAllByUserId(userId), new TypeToken<List<AssetListViewDTO>>(){}.getType());
     }
 }

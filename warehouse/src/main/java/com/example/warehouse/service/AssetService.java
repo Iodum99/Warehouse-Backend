@@ -15,5 +15,5 @@ public interface AssetService {
     void deleteAsset(int id);
 
     List<AssetListViewDTO> findAllAssets();
-    List<AssetListViewDTO> findAllAssetsByAuthor(String author);
+    List<AssetListViewDTO> findAllAssetsByUserId(int id);
 }

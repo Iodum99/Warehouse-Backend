@@ -14,6 +14,7 @@ public class Asset {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    private int userId;
     private String author;
     private String name;
     private String description;

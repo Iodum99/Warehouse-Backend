@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 public class AssetListViewDTO {
     private int id;
+    private int userId;
     private String author;
     private String name;
     private String description;
