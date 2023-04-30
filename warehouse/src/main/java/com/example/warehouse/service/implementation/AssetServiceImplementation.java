@@ -1,9 +1,7 @@
 package com.example.warehouse.service.implementation;
 
 import com.example.warehouse.dto.AssetDTO;
-import com.example.warehouse.dto.AssetListViewDTO;
 import com.example.warehouse.dto.NewAssetDTO;
-import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
 import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
@@ -12,7 +10,6 @@ import com.example.warehouse.model.User;
 import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.AssetService;
-import com.example.warehouse.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -36,7 +33,7 @@ public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
     private final UserRepository userRepository;
-    private static final String DIRECTORY = System.getProperty("user.dir") + "\\assets\\user_id_%d\\asset_id_%d";
+    private static final String DIRECTORY = "..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\user_id_%d\\asset_id_%d";
     ModelMapper modelMapper = new ModelMapper();
     @Override
     public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
@@ -81,8 +78,7 @@ public class AssetServiceImplementation implements AssetService {
 
     private void createAssetDirectory(int userId, int assetId) {
         try {
-            Files.createDirectories(Paths.get(System.getProperty("user.dir") +
-                    "\\assets\\user_id_" + userId
+            Files.createDirectories(Paths.get("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\user_id_" + userId
                     + "\\asset_id_" + assetId));
         } catch (Exception e){
             e.printStackTrace();
@@ -166,21 +162,21 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public List<AssetListViewDTO> findAllAssets() {
+    public List<AssetDTO> findAllAssets() {
         return modelMapper
-                .map(assetRepository.findAll(), new TypeToken<List<AssetListViewDTO>>(){}.getType());
+                .map(assetRepository.findAll(), new TypeToken<List<AssetDTO>>(){}.getType());
     }
 
     @Override
-    public List<AssetListViewDTO> findAllAssetsByUserId(int userId) {
+    public List<AssetDTO> findAllAssetsByUserId(int userId) {
         return modelMapper
-                .map(assetRepository.findAllByUserId(userId), new TypeToken<List<AssetListViewDTO>>(){}.getType());
+                .map(assetRepository.findAllByUserId(userId), new TypeToken<List<AssetDTO>>(){}.getType());
     }
 
     @Override
-    public List<AssetListViewDTO> findAllAssetsByType(String type) {
+    public List<AssetDTO> findAllAssetsByType(String type) {
        return modelMapper
-                .map(assetRepository.findAllByAssetType(AssetType.valueOf(type)),
-                        new TypeToken<List<AssetListViewDTO>>(){}.getType());
+                .map(assetRepository.findAllByAssetType(AssetType.valueOf(type.toUpperCase())),
+                        new TypeToken<List<AssetDTO>>(){}.getType());
     }
 }

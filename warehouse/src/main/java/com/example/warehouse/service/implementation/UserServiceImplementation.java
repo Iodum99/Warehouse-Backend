@@ -36,6 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImplementation implements UserService {
 
+    private static final String DIRECTORY = "..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\user_id_%d";
     public PasswordEncoder passwordEncoder()
     {
         return new BCryptPasswordEncoder();
@@ -69,7 +70,7 @@ public class UserServiceImplementation implements UserService {
 
     private void createUserDirectory(int id) {
         try {
-            Files.createDirectories(Paths.get(System.getProperty("user.dir") + "/assets/user_id_" + id));
+            Files.createDirectories(Paths.get(DIRECTORY.formatted(id)));
         } catch (Exception e){
             e.printStackTrace();
         }
