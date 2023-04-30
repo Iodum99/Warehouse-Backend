@@ -19,9 +19,8 @@ public class Asset {
     private String name;
     private String description;
     private String filePath;
-    private byte[] image;
     @ElementCollection
-    private List<byte[]> gallery;
+    private List<String> imagePaths;
     private AssetType assetType;
     private LocalDate uploadDate;
     private LocalDate lastModifiedDate;

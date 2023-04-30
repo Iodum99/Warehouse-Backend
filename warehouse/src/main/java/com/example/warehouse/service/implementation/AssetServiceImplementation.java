@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,35 +36,57 @@ public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
     private final UserRepository userRepository;
-    private static final String directoryPath = System.getProperty("user.dir") + "/assets/user_id_";
+    private static final String DIRECTORY = System.getProperty("user.dir") + "\\assets\\user_id_%d\\asset_id_%d";
     ModelMapper modelMapper = new ModelMapper();
     @Override
     public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Asset asset = modelMapper.map(newAssetDTO, Asset.class);
+        Asset asset = assetRepository.save(modelMapper.map(newAssetDTO, Asset.class));
         User author = userRepository.findById(newAssetDTO.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("UserId: " + newAssetDTO.getUserId()));
-        asset.setAuthor(author.getUsername());
-        asset.setUploadDate(LocalDate.now());
-        String path = directoryPath + author.getId() + "/" + author.getUsername() + "_" + newAssetDTO.getName().replace(" ","_") + ".zip";
+        String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
         try{
-            if(gallery != null)
-                asset.setGallery(getByteArrayForGallery(gallery));
-            Files.write(Path.of(path), file.getBytes());
-            asset.setFilePath(path);
-            asset.setImage(image.getBytes());
+            createAssetDirectory(newAssetDTO.getUserId(), asset.getId());
+            String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), newAssetDTO.getName().replace(" ", "_"));
+            Files.write(Path.of(assetPath), file.getBytes());
+            asset.setFilePath(assetPath);
+            asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
+            asset.setAuthor(author.getUsername());
+            asset.setUploadDate(LocalDate.now());
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private List<byte[]> getByteArrayForGallery(List<MultipartFile> gallery) throws IOException {
-        List<byte[]> galleryBytes = new ArrayList<>();
-        for(MultipartFile image: gallery)
-            galleryBytes.add(image.getBytes());
+    private List<String> getImagePaths(MultipartFile image, List<MultipartFile> gallery, String directory){
+        List<String> paths = new ArrayList<>();
+        try{
+            Files.write(Path.of(directory + "\\main.jpg"), image.getBytes());
+            paths.add(directory + "\\main.jpg");
+            int index = 1;
+            if(gallery != null){
+                for(MultipartFile galleryImage: gallery){
+                    Files.write(Path.of(directory + "\\gallery" + index + ".jpg"), galleryImage.getBytes());
+                    paths.add(directory + "\\gallery" + index + ".jpg");
+                    index++;
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-        return galleryBytes;
+        return paths;
+    }
+
+    private void createAssetDirectory(int userId, int assetId) {
+        try {
+            Files.createDirectories(Paths.get(System.getProperty("user.dir") +
+                    "\\assets\\user_id_" + userId
+                    + "\\asset_id_" + assetId));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -81,28 +104,51 @@ public class AssetServiceImplementation implements AssetService {
         asset.setName(assetDTO.getName());
         asset.setDescription(asset.getDescription());
         asset.setLastModifiedDate(LocalDate.now());
+        String assetDirectory = DIRECTORY.formatted(asset.getUserId(), asset.getId());
         try{
-            if(image != null)
-                asset.setImage(image.getBytes());
-            if(file != null){
+           //TODO: Edit image and gallery
+            if(file != null)
                 renameFileOnAssetUpdate(asset, assetDTO.getName(), file);
-            }
-            if(gallery != null)
-                asset.setGallery(getByteArrayForGallery(gallery));
+            Files.write(Path.of(asset.getImagePaths().get(0)), image.getBytes());
+            asset.setImagePaths(updateImages(asset.getImagePaths(), gallery, image, assetDirectory));
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
+    private List<String> updateImages(
+            List<String> originalPaths,
+            List<MultipartFile> gallery,
+            MultipartFile image,
+            String assetDirectory) throws IOException {
+
+        List<String> newImagePaths = new ArrayList<>();
+
+        if(gallery != null){
+            if(originalPaths.size() > 1){
+                for(int i = 1; i < originalPaths.size(); i++)
+                    Files.deleteIfExists(Path.of(originalPaths.get(i)));
+            }
+            newImagePaths = getImagePaths(image, gallery, assetDirectory );
+        } else if (originalPaths.size() > 1){
+            for(int i = 1; i < originalPaths.size(); i++)
+                Files.deleteIfExists(Path.of(originalPaths.get(i)));
+            newImagePaths = getImagePaths(image, null, assetDirectory );
+        }
+
+        return newImagePaths;
+    }
+
     private void renameFileOnAssetUpdate(Asset asset, String name, MultipartFile file) throws IOException {
         User author = userRepository.findById(asset.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("UserId: " + asset.getUserId()));
         File originalFile = new File(asset.getFilePath());
-        String path = directoryPath + author.getId() + "/" + author.getUsername() + "_" + name.replace(" ","_") + ".zip";
-        File newFile = new File(path);
+        String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
+        String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), name.replace(" ", "_"));
+        File newFile = new File(assetPath);
         if(originalFile.renameTo(newFile))
-            Files.write(Path.of(path), file.getBytes());
+            Files.write(Path.of(assetPath), file.getBytes());
     }
 
     @Override
@@ -110,10 +156,13 @@ public class AssetServiceImplementation implements AssetService {
         Asset asset = assetRepository.findById(id).orElseThrow(() -> new AssetNotFoundException("AssetId: " + id));
         try {
             Files.deleteIfExists(Path.of(asset.getFilePath()));
+            for(String path: asset.getImagePaths())
+                Files.deleteIfExists(Path.of(path));
+            Files.deleteIfExists(Path.of(DIRECTORY.formatted(asset.getUserId(), asset.getId())));
+            assetRepository.deleteById(id);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        assetRepository.deleteById(id);
     }
 
     @Override

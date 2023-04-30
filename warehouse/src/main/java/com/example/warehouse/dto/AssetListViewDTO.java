@@ -13,7 +13,7 @@ public class AssetListViewDTO {
     private String author;
     private String name;
     private String description;
-    private byte[] image;
+    private String image;
     private AssetType assetType;
     private LocalDate uploadDate;
 }
