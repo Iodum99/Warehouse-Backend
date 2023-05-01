@@ -21,15 +21,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -136,8 +131,8 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void initialize() {
         try{
-            byte[] img = img = Files.readAllBytes(
-                    new File(System.getProperty("user.dir") + "/assets/default_avatar.png").toPath());
+            byte[] img = Files.readAllBytes(
+                    new File(System.getProperty("user.dir") + "\\assets\\default_avatar.png").toPath());
             User user1 = new User(
                     "Iodum",passwordEncoder().encode("ADMINsifra123"), "iodum@admin.com", "Dejan", "Bjelic",
                     "", "", "Serbia", LocalDate.of(1999, 4, 5),

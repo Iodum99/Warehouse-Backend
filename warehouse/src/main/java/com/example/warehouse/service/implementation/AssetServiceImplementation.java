@@ -141,7 +141,7 @@ public class AssetServiceImplementation implements AssetService {
                 .orElseThrow(() -> new UserNotFoundException("UserId: " + asset.getUserId()));
         File originalFile = new File(asset.getFilePath());
         String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
-        String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), name.replace(" ", "_"));
+        String assetPath = assetDirectory + "\\%s_%s.zip".formatted(author.getUsername(), name.replace(" ", "_"));
         File newFile = new File(assetPath);
         if(originalFile.renameTo(newFile))
             Files.write(Path.of(assetPath), file.getBytes());
