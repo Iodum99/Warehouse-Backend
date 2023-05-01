@@ -50,6 +50,7 @@ public class AssetServiceImplementation implements AssetService {
             asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
             asset.setAuthor(author.getUsername());
             asset.setUploadDate(LocalDate.now());
+            asset.setDownloads(0);
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
@@ -178,5 +179,14 @@ public class AssetServiceImplementation implements AssetService {
        return modelMapper
                 .map(assetRepository.findAllByAssetType(AssetType.valueOf(type.toUpperCase())),
                         new TypeToken<List<AssetDTO>>(){}.getType());
+    }
+
+    @Override
+    public void increaseDownloadsCount(int id) {
+        Asset asset = assetRepository.findById(id)
+                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + id));
+        int downloadsCount = asset.getDownloads();
+        asset.setDownloads(++downloadsCount);
+        assetRepository.save(asset);
     }
 }

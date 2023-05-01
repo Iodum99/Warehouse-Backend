@@ -24,4 +24,5 @@ public class Asset {
     private AssetType assetType;
     private LocalDate uploadDate;
     private LocalDate lastModifiedDate;
+    private int downloads;
 }

@@ -65,4 +65,10 @@ public class AssetController {
     public ResponseEntity<?> getAllAssetsByType(@PathVariable String type){
         return new ResponseEntity<>(assetService.findAllAssetsByType(type), HttpStatus.OK);
     }
+
+    @PutMapping("/downloads/{id}")
+    public ResponseEntity<?> increaseDownloadsCount(@PathVariable int id){
+        assetService.increaseDownloadsCount(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

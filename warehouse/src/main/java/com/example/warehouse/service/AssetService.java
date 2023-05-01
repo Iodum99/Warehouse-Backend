@@ -12,8 +12,8 @@ public interface AssetService {
     AssetDTO findAssetById(int id);
     void updateAsset(AssetDTO asset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery);
     void deleteAsset(int id);
-
     List<AssetDTO> findAllAssets();
     List<AssetDTO> findAllAssetsByUserId(int id);
     List<AssetDTO> findAllAssetsByType(String type);
+    void increaseDownloadsCount(int id);
 }

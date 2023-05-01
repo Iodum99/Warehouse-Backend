@@ -19,4 +19,5 @@ public class AssetDTO {
     private AssetType assetType;
     private LocalDate uploadDate;
     private LocalDate lastModifiedDate;
+    private int downloads;
 }
