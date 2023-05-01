@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -25,4 +26,12 @@ public class Asset {
     private LocalDate uploadDate;
     private LocalDate lastModifiedDate;
     private int downloads;
+    @ElementCollection
+    private List<Integer> userIdLikes;
+
+    public Asset(){
+        this.uploadDate = LocalDate.now();
+        this.downloads = 0;
+        this.userIdLikes = new ArrayList<>();
+    }
 }

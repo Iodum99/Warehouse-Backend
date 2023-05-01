@@ -71,4 +71,17 @@ public class AssetController {
         assetService.increaseDownloadsCount(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PutMapping("/likes/{assetId}_{userId}")
+    public ResponseEntity<?> manageLikes(
+            @PathVariable int assetId,
+            @PathVariable int userId){
+        assetService.manageLikes(assetId, userId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/favorites/{id}")
+    public ResponseEntity<?> getFavoritesByUserId(@PathVariable int id){
+        return new ResponseEntity<>(assetService.findFavoritesByUserId(id), HttpStatus.OK);
+    }
 }

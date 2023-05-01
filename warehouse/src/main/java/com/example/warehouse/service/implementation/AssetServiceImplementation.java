@@ -49,8 +49,6 @@ public class AssetServiceImplementation implements AssetService {
             asset.setFilePath(assetPath);
             asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
             asset.setAuthor(author.getUsername());
-            asset.setUploadDate(LocalDate.now());
-            asset.setDownloads(0);
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
@@ -188,5 +186,23 @@ public class AssetServiceImplementation implements AssetService {
         int downloadsCount = asset.getDownloads();
         asset.setDownloads(++downloadsCount);
         assetRepository.save(asset);
+    }
+
+    @Override
+    public void manageLikes(int assetId, int userId) {
+        Asset asset = assetRepository.findById(assetId)
+                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + assetId));
+        if(asset.getUserIdLikes().contains(userId))
+            asset.getUserIdLikes().remove((Integer) userId);
+        else
+            asset.getUserIdLikes().add(userId);
+        assetRepository.save(asset);
+    }
+
+    @Override
+    public List<AssetDTO> findFavoritesByUserId(int userId) {
+        return modelMapper
+                .map(assetRepository.findFavoritesByUserId(userId),
+                        new TypeToken<List<AssetDTO>>(){}.getType());
     }
 }

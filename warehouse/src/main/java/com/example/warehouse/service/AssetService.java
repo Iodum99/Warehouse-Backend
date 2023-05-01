@@ -16,4 +16,7 @@ public interface AssetService {
     List<AssetDTO> findAllAssetsByUserId(int id);
     List<AssetDTO> findAllAssetsByType(String type);
     void increaseDownloadsCount(int id);
+    void manageLikes(int assetId, int userId);
+
+    List<AssetDTO> findFavoritesByUserId(int userId);
 }
