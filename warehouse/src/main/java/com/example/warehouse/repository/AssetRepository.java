@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface AssetRepository extends JpaRepository<Asset, Integer> {
 
-    List<Asset> findAllByUserId(int userId);
+    List<Asset> findAllByUserIdAndAssetType(int userId, AssetType assetType);
     List<Asset> findAllByAssetType(AssetType assetType);
 
     @Query("select a from Asset a where :userId IN elements(a.userIdLikes)")

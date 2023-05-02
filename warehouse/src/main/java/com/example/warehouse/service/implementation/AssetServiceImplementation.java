@@ -167,9 +167,10 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public List<AssetDTO> findAllAssetsByUserId(int userId) {
+    public List<AssetDTO> findAllAssetsByUserIdAndAssetType(int userId, String type) {
         return modelMapper
-                .map(assetRepository.findAllByUserId(userId), new TypeToken<List<AssetDTO>>(){}.getType());
+                .map(assetRepository.findAllByUserIdAndAssetType(userId, AssetType.valueOf(type.toUpperCase())),
+                        new TypeToken<List<AssetDTO>>(){}.getType());
     }
 
     @Override
