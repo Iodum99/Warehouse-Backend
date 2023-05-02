@@ -19,7 +19,7 @@ public class UserDTO {
     private String country;
     private LocalDate dateOfBirth;
     private LocalDate joinDate;
-    private byte[] avatar;
+    private String avatar;
     private boolean enabled;
     private Role role;
 }

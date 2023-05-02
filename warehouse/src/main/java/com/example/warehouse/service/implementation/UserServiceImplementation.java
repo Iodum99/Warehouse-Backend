@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
@@ -98,8 +99,11 @@ public class UserServiceImplementation implements UserService {
             editUser.setPassword(passwordEncoder().encode(userDTO.getPassword()));
 
         try{
-            if(image != null)
-                editUser.setAvatar(image.getBytes());
+            if(image != null){
+                Files.write(Path.of(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg"), image.getBytes());
+                editUser.setAvatar(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg");
+            }
+
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -131,29 +135,28 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void initialize() {
         try{
-            byte[] img = Files.readAllBytes(
-                    new File(System.getProperty("user.dir") + "\\assets\\default_avatar.png").toPath());
+
             User user1 = new User(
                     "Iodum",passwordEncoder().encode("ADMINsifra123"), "iodum@admin.com", "Dejan", "Bjelic",
                     "", "", "Serbia", LocalDate.of(1999, 4, 5),
-                    img,Role.ADMIN, LocalDate.of(2023, 1, 1));
+                    null,Role.ADMIN, LocalDate.of(2023, 1, 1));
             User user2 = new User(
                     "Delca",passwordEncoder().encode("USERsifra123"), "delca@gmail.com", "Delca", "Britt",
                     "I am an introvert boy, born in late 1998! (Lie, I was born befire Christ and dinsaurs were my pets. I am the cause of the Big Bang, oops!)", "Graphics design, binging series, Eurovision and in free time I like to pretend I am the Qeen Elizabeth!",
                     "France", LocalDate.of(1998, 11, 26),
-                    img,Role.USER, LocalDate.of(2023, 1, 2));
+                    null,Role.USER, LocalDate.of(2023, 1, 2));
 
             User user3 = new User(
                     "MarlenaCrystal",passwordEncoder().encode("USERsifra123"), "marlena@gmail.com", "Marlena", "Crystal",
                     "80s Queen slaying in free time", "Video games, 80s music production",
                     "Germany", LocalDate.of(1997, 3, 9),
-                    img,Role.USER, LocalDate.of(2023, 1, 2));
+                    null,Role.USER, LocalDate.of(2023, 1, 2));
 
             User user4 = new User(
                     "Dermahn",passwordEncoder().encode("USERsifra123"), "dermahn@gmail.com", "Dominik", "Taylor",
                     "Skater boy and a punk", "Video games, watching series",
                     "Germany", LocalDate.of(1996, 8, 13),
-                    img,Role.USER, LocalDate.of(2023, 1, 2));
+                    null,Role.USER, LocalDate.of(2023, 1, 2));
 
             createUserDirectory(1);
             createUserDirectory(2);

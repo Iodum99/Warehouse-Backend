@@ -25,7 +25,7 @@ public class User {
     private String country;
     private LocalDate dateOfBirth;
     private LocalDate joinDate;
-    private byte[] avatar;
+    private String avatar;
     private boolean enabled;
     private Role role;
 
@@ -38,7 +38,7 @@ public class User {
                 String interests,
                 String country,
                 LocalDate dateOfBirth,
-                byte[] avatar,
+                String avatar,
                 Role role,
                 LocalDate joinDate
                 ){
