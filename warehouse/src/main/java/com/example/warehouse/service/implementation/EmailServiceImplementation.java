@@ -26,8 +26,7 @@ public class EmailServiceImplementation implements EmailService {
             helper.setTo(email);
             helper.setSubject("Account Verification");
             helper.setFrom(sender);
-            //TODO: Create page on front
-            mimeMessage.setContent("http://localhost:8080/api/token/verify/" + token, "text/html");
+            mimeMessage.setContent("http://localhost:4200/verification/token/" + token, "text/html");
             javaMailSender.send(mimeMessage);
         } catch (Exception e){
             e.printStackTrace();

@@ -51,7 +51,7 @@ public class UserServiceImplementation implements UserService {
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
         User createdUser = userRepository.save(newUser);
         VerificationToken createdToken = verificationTokenRepository.save(new VerificationToken(createdUser.getId()));
-        //emailService.sendVerificationEmail(newUser.getEmail(), createdToken.getId().toString());
+        emailService.sendVerificationEmail(newUser.getEmail(), createdToken.getId().toString());
         createUserDirectory(createdUser.getId());
     }
 
