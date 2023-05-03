@@ -44,7 +44,8 @@ public class AssetServiceImplementation implements AssetService {
         String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
         try{
             createAssetDirectory(newAssetDTO.getUserId(), asset.getId());
-            String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), newAssetDTO.getName().replace(" ", "_"));
+            String fileName = newAssetDTO.getName().replaceAll("[^a-zA-Z0-9.-]","");
+            String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), fileName);
             Files.write(Path.of(assetPath), file.getBytes());
             asset.setFilePath(assetPath);
             asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
@@ -141,7 +142,8 @@ public class AssetServiceImplementation implements AssetService {
                 .orElseThrow(() -> new UserNotFoundException("UserId: " + asset.getUserId()));
         File originalFile = new File(asset.getFilePath());
         String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
-        String assetPath = assetDirectory + "\\%s_%s.zip".formatted(author.getUsername(), name.replace(" ", "_"));
+        String fileName = name.replaceAll("[^a-zA-Z0-9.-]","");
+        String assetPath = assetDirectory + "\\%s_%s.zip".formatted(author.getUsername(), fileName);
         File newFile = new File(assetPath);
         if(originalFile.renameTo(newFile))
             Files.write(Path.of(assetPath), file.getBytes());

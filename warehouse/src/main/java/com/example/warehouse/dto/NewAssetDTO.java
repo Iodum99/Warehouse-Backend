@@ -3,6 +3,8 @@ package com.example.warehouse.dto;
 import com.example.warehouse.model.AssetType;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class NewAssetDTO {
 
@@ -10,4 +12,5 @@ public class NewAssetDTO {
     private String name;
     private String description;
     private AssetType assetType;
+    private List<String> tags;
 }

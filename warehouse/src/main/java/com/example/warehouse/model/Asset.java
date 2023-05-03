@@ -17,8 +17,11 @@ public class Asset {
     private int id;
     private int userId;
     private String author;
+    @Column(columnDefinition="TEXT")
     private String name;
+    @Column(columnDefinition="TEXT")
     private String description;
+    @Column(columnDefinition="TEXT")
     private String filePath;
     @ElementCollection
     private List<String> imagePaths;
