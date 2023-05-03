@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AssetService {
 
-    void createAsset(NewAssetDTO newAsset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery);
+    AssetDTO createAsset(NewAssetDTO newAsset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery);
     AssetDTO findAssetById(int id);
     void updateAsset(AssetDTO asset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery);
     void deleteAsset(int id);

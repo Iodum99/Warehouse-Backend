@@ -28,6 +28,8 @@ public class Asset {
     private int downloads;
     @ElementCollection
     private List<Integer> userIdLikes;
+    @ElementCollection
+    private List<String> tags;
 
     public Asset(){
         this.uploadDate = LocalDate.now();

@@ -5,7 +5,5 @@ public enum AssetType {
     OBJECT,
     TEXTURE,
     AUDIO,
-    FONT,
-    GUI,
-    VFX
+    ANIMATION
 }

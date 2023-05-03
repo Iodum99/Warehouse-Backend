@@ -21,4 +21,5 @@ public class AssetDTO {
     private LocalDate lastModifiedDate;
     private int downloads;
     private List<Integer> userIdLikes;
+    private List<String> tags;
 }

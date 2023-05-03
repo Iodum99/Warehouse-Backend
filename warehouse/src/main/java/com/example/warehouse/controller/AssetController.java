@@ -27,8 +27,8 @@ public class AssetController {
             @RequestPart("file") MultipartFile file,
             @RequestPart("image") MultipartFile image,
             @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery){
-        assetService.createAsset(newAssetDTO, file, image, gallery);
-        return new ResponseEntity<>(HttpStatus.OK);
+        AssetDTO assetDTO = assetService.createAsset(newAssetDTO, file, image, gallery);
+        return new ResponseEntity<>(assetDTO, HttpStatus.OK);
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> getAssetById(@PathVariable int id){

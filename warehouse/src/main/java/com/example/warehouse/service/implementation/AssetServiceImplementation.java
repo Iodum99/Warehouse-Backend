@@ -36,7 +36,7 @@ public class AssetServiceImplementation implements AssetService {
     private static final String DIRECTORY = "..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\user_id_%d\\asset_id_%d";
     ModelMapper modelMapper = new ModelMapper();
     @Override
-    public void createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
+    public AssetDTO createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Asset asset = assetRepository.save(modelMapper.map(newAssetDTO, Asset.class));
         User author = userRepository.findById(newAssetDTO.getUserId())
@@ -49,10 +49,11 @@ public class AssetServiceImplementation implements AssetService {
             asset.setFilePath(assetPath);
             asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
             asset.setAuthor(author.getUsername());
-            assetRepository.save(asset);
+
         } catch (Exception e){
             e.printStackTrace();
         }
+        return modelMapper.map(assetRepository.save(asset), AssetDTO.class);
     }
 
     private List<String> getImagePaths(MultipartFile image, List<MultipartFile> gallery, String directory){
