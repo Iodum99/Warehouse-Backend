@@ -18,4 +18,5 @@ public interface AssetService {
     void increaseDownloadsCount(int id);
     void manageLikes(int assetId, int userId);
     List<AssetDTO> findFavoritesByUserId(int userId);
+
 }

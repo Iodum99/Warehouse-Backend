@@ -2,11 +2,8 @@ package com.example.warehouse.controller;
 
 import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.NewAssetDTO;
-import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.service.AssetService;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,7 +42,7 @@ public class AssetController {
     public ResponseEntity<?> updateAsset(
             @RequestPart("asset") AssetDTO assetDTO,
             @RequestPart(value = "file", required = false) MultipartFile file,
-            @RequestPart("image") MultipartFile image,
+            @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery){
         assetService.updateAsset(assetDTO, file, image, gallery);
         return new ResponseEntity<>(HttpStatus.OK);

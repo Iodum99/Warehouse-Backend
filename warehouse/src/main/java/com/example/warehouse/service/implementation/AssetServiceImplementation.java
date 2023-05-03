@@ -60,7 +60,10 @@ public class AssetServiceImplementation implements AssetService {
     private List<String> getImagePaths(MultipartFile image, List<MultipartFile> gallery, String directory){
         List<String> paths = new ArrayList<>();
         try{
-            Files.write(Path.of(directory + "\\main.jpg"), image.getBytes());
+            //Check if it's null for Editing to skip writing
+            if(image != null)
+                Files.write(Path.of(directory + "\\main.jpg"), image.getBytes());
+
             paths.add(directory + "\\main.jpg");
             int index = 1;
             if(gallery != null){
@@ -98,16 +101,20 @@ public class AssetServiceImplementation implements AssetService {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Asset asset = assetRepository.findById(assetDTO.getId())
                 .orElseThrow(() -> new AssetNotFoundException("AssetId: " + assetDTO.getId()));
-        asset.setName(assetDTO.getName());
-        asset.setDescription(asset.getDescription());
+        asset = modelMapper.map(assetDTO, Asset.class);
         asset.setLastModifiedDate(LocalDate.now());
         String assetDirectory = DIRECTORY.formatted(asset.getUserId(), asset.getId());
         try{
-           //TODO: Edit image and gallery
-            if(file != null)
-                renameFileOnAssetUpdate(asset, assetDTO.getName(), file);
-            Files.write(Path.of(asset.getImagePaths().get(0)), image.getBytes());
+            if(file != null){
+                String newFileName =  renameFileOnAssetUpdate(asset, assetDTO.getName(), file);
+                asset.setFilePath(newFileName);
+            }
+            if(image != null){
+                Files.write(Path.of(asset.getImagePaths().get(0)), image.getBytes());
+            }
+
             asset.setImagePaths(updateImages(asset.getImagePaths(), gallery, image, assetDirectory));
+
             assetRepository.save(asset);
         } catch (Exception e){
             e.printStackTrace();
@@ -120,24 +127,21 @@ public class AssetServiceImplementation implements AssetService {
             MultipartFile image,
             String assetDirectory) throws IOException {
 
-        List<String> newImagePaths = new ArrayList<>();
-
-        if(gallery != null){
-            if(originalPaths.size() > 1){
-                for(int i = 1; i < originalPaths.size(); i++)
+        List<String> newImagePaths;
+        if(gallery != null) {
+            if (originalPaths.size() > 1)
+                for (int i = 1; i < originalPaths.size(); i++)
                     Files.deleteIfExists(Path.of(originalPaths.get(i)));
-            }
-            newImagePaths = getImagePaths(image, gallery, assetDirectory );
-        } else if (originalPaths.size() > 1){
-            for(int i = 1; i < originalPaths.size(); i++)
-                Files.deleteIfExists(Path.of(originalPaths.get(i)));
-            newImagePaths = getImagePaths(image, null, assetDirectory );
+            newImagePaths = getImagePaths(image, gallery, assetDirectory);
+        } else {
+            newImagePaths = originalPaths;
         }
+        //TODO: Else pass gallery as null to remove entire gallery
 
         return newImagePaths;
     }
 
-    private void renameFileOnAssetUpdate(Asset asset, String name, MultipartFile file) throws IOException {
+    private String renameFileOnAssetUpdate(Asset asset, String name, MultipartFile file) throws IOException {
         User author = userRepository.findById(asset.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("UserId: " + asset.getUserId()));
         File originalFile = new File(asset.getFilePath());
@@ -147,6 +151,7 @@ public class AssetServiceImplementation implements AssetService {
         File newFile = new File(assetPath);
         if(originalFile.renameTo(newFile))
             Files.write(Path.of(assetPath), file.getBytes());
+        return assetPath;
     }
 
     @Override
