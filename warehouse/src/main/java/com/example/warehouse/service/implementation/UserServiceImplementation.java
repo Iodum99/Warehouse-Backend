@@ -135,6 +135,8 @@ public class UserServiceImplementation implements UserService {
     public void initialize() {
         try{
 
+            Files.createDirectories(Path.of("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp"));
+
             User user1 = new User(
                     "Iodum",passwordEncoder().encode("ADMINsifra123"), "iodum@admin.com", "Dejan", "Bjelic",
                     "", "", "Serbia", LocalDate.of(1999, 4, 5),

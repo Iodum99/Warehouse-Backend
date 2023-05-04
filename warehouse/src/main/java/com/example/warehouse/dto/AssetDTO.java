@@ -22,4 +22,5 @@ public class AssetDTO {
     private int downloads;
     private List<Integer> userIdLikes;
     private List<String> tags;
+    private List<String> extensions;
 }

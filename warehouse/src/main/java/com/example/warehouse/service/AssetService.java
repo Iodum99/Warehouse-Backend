@@ -4,13 +4,14 @@ import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface AssetService {
 
-    AssetDTO createAsset(NewAssetDTO newAsset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery);
+    AssetDTO createAsset(NewAssetDTO newAsset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) throws IOException;
     AssetDTO findAssetById(int id);
-    void updateAsset(AssetDTO asset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery);
+    void updateAsset(AssetDTO asset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) throws IOException;
     void deleteAsset(int id);
     List<AssetDTO> findAllAssets();
     List<AssetDTO> findAllAssetsByUserIdAndAssetType(int id, String assetType);

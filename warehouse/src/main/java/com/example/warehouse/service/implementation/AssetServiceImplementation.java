@@ -3,6 +3,7 @@ package com.example.warehouse.service.implementation;
 import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
+import com.example.warehouse.exception.AssetUnsupportedExtensionException;
 import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
 import com.example.warehouse.model.AssetType;
@@ -18,13 +19,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 @Service
@@ -33,28 +37,78 @@ public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
     private final UserRepository userRepository;
+    private static final Map<AssetType, List<String>> SUPPORTED_EXTENSIONS = createMap();
+    private static Map<AssetType, List<String>> createMap() {
+        return Map.of(
+                AssetType.OBJECT, new ArrayList<>(Arrays.asList("3ds", "fbx", "obj", "dae")),
+                AssetType.TEXTURE, new ArrayList<>(Arrays.asList("png", "bmp", "tga", "jpg")),
+                AssetType.AUDIO, new ArrayList<>(Arrays.asList("mp3", "wav", "flac")),
+                AssetType.ANIMATION, new ArrayList<>(Arrays.asList("fbx", "3ds")));
+    }
     private static final String DIRECTORY = "..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\user_id_%d\\asset_id_%d";
     ModelMapper modelMapper = new ModelMapper();
     @Override
-    public AssetDTO createAsset(NewAssetDTO newAssetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
+    public AssetDTO createAsset(
+            NewAssetDTO newAssetDTO,
+            MultipartFile file,
+            MultipartFile image,
+            List<MultipartFile> gallery) throws IOException {
+
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        List<String> extensions = getExtensions(newAssetDTO.getAssetType(), file);
         Asset asset = assetRepository.save(modelMapper.map(newAssetDTO, Asset.class));
         User author = userRepository.findById(newAssetDTO.getUserId())
                 .orElseThrow(() -> new UserNotFoundException("UserId: " + newAssetDTO.getUserId()));
         String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
-        try{
-            createAssetDirectory(newAssetDTO.getUserId(), asset.getId());
+            asset.setExtensions(extensions);
             String fileName = newAssetDTO.getName().replaceAll("[^a-zA-Z0-9.-]","");
             String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), fileName);
+            createAssetDirectory(newAssetDTO.getUserId(), asset.getId());
             Files.write(Path.of(assetPath), file.getBytes());
             asset.setFilePath(assetPath);
             asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
             asset.setAuthor(author.getUsername());
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
         return modelMapper.map(assetRepository.save(asset), AssetDTO.class);
+    }
+
+    private List<String> getExtensions(AssetType type, MultipartFile file) throws IOException {
+
+        Path path = Path.of("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp\\temp.zip");
+        Files.write(path, file.getBytes());
+        List<String> extensions = readExtensionsFromZippedFile("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp\\temp.zip");
+        List<String> validExtensions = new ArrayList<>();
+            //Check if found extension matches supported for required asset type
+            List<String> supportedExtensions = SUPPORTED_EXTENSIONS.get(type);
+            for(String extension: extensions){
+                if(supportedExtensions.contains(extension))
+                    validExtensions.add(extension);
+            }
+            if(validExtensions.size() == 0){
+                Files.deleteIfExists(path);
+                throw new AssetUnsupportedExtensionException(type.toString());
+            }
+        Files.deleteIfExists(path);
+        return validExtensions;
+    }
+
+    private List<String> readExtensionsFromZippedFile(String filepath) throws IOException {
+
+        List<String> extensions = new ArrayList<>();
+        Set<String> set = new HashSet<>(extensions);
+        File asset = new File(filepath);
+        InputStream in = new FileInputStream(asset);
+        ZipInputStream zis = new ZipInputStream(in);
+        ZipEntry entry;
+        byte[] buffer = new byte[1024];
+        //Iterate through archive and extract all extensions
+        while ((entry = zis.getNextEntry())!= null) {
+            while ((zis.read(buffer, 0, 1024)) >= 0) {
+                set.add(entry.getName().split("\\.")[1]);
+            }
+        }
+        extensions.addAll(set);
+        zis.close();
+        return extensions;
     }
 
     private List<String> getImagePaths(MultipartFile image, List<MultipartFile> gallery, String directory){
@@ -97,28 +151,23 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public void updateAsset(AssetDTO assetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) {
+    public void updateAsset(AssetDTO assetDTO, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) throws IOException {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        Asset asset = assetRepository.findById(assetDTO.getId())
-                .orElseThrow(() -> new AssetNotFoundException("AssetId: " + assetDTO.getId()));
-        asset = modelMapper.map(assetDTO, Asset.class);
+        Asset asset = modelMapper.map(assetDTO, Asset.class);
         asset.setLastModifiedDate(LocalDate.now());
         String assetDirectory = DIRECTORY.formatted(asset.getUserId(), asset.getId());
-        try{
-            if(file != null){
-                String newFileName =  renameFileOnAssetUpdate(asset, assetDTO.getName(), file);
-                asset.setFilePath(newFileName);
-            }
-            if(image != null){
-                Files.write(Path.of(asset.getImagePaths().get(0)), image.getBytes());
-            }
-
-            asset.setImagePaths(updateImages(asset.getImagePaths(), gallery, image, assetDirectory));
-
-            assetRepository.save(asset);
-        } catch (Exception e){
-            e.printStackTrace();
+        if(file != null){
+            String fileName = assetDTO.getName().replaceAll("[^a-zA-Z0-9.-]","");
+            String newAssetPath = assetDirectory + "\\%s_%s.zip".formatted(assetDTO.getAuthor(), fileName);
+            asset.setExtensions(getExtensions(asset.getAssetType(), file));
+            renameFileOnAssetUpdate(asset, newAssetPath, file);
+            asset.setFilePath(newAssetPath);
         }
+        if(image != null){
+            Files.write(Path.of(asset.getImagePaths().get(0)), image.getBytes());
+        }
+        asset.setImagePaths(updateImages(asset.getImagePaths(), gallery, image, assetDirectory));
+        assetRepository.save(asset);
     }
 
     private List<String> updateImages(
@@ -141,17 +190,11 @@ public class AssetServiceImplementation implements AssetService {
         return newImagePaths;
     }
 
-    private String renameFileOnAssetUpdate(Asset asset, String name, MultipartFile file) throws IOException {
-        User author = userRepository.findById(asset.getUserId())
-                .orElseThrow(() -> new UserNotFoundException("UserId: " + asset.getUserId()));
+    private void renameFileOnAssetUpdate(Asset asset, String newPath, MultipartFile file) throws IOException {
         File originalFile = new File(asset.getFilePath());
-        String assetDirectory = DIRECTORY.formatted(author.getId(), asset.getId());
-        String fileName = name.replaceAll("[^a-zA-Z0-9.-]","");
-        String assetPath = assetDirectory + "\\%s_%s.zip".formatted(author.getUsername(), fileName);
-        File newFile = new File(assetPath);
+        File newFile = new File(newPath);
         if(originalFile.renameTo(newFile))
-            Files.write(Path.of(assetPath), file.getBytes());
-        return assetPath;
+            Files.write(Path.of(newPath), file.getBytes());
     }
 
     @Override

@@ -33,10 +33,14 @@ public class Asset {
     private List<Integer> userIdLikes;
     @ElementCollection
     private List<String> tags;
+    @ElementCollection
+    private List<String> extensions;
 
     public Asset(){
         this.uploadDate = LocalDate.now();
         this.downloads = 0;
         this.userIdLikes = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.extensions = new ArrayList<>();
     }
 }

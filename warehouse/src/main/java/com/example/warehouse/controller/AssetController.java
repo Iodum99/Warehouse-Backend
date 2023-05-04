@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,7 +24,7 @@ public class AssetController {
             @RequestPart("asset") NewAssetDTO newAssetDTO,
             @RequestPart("file") MultipartFile file,
             @RequestPart("image") MultipartFile image,
-            @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery){
+            @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery) throws IOException {
         AssetDTO assetDTO = assetService.createAsset(newAssetDTO, file, image, gallery);
         return new ResponseEntity<>(assetDTO, HttpStatus.OK);
     }
@@ -43,7 +44,7 @@ public class AssetController {
             @RequestPart("asset") AssetDTO assetDTO,
             @RequestPart(value = "file", required = false) MultipartFile file,
             @RequestPart(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery){
+            @RequestPart(value = "gallery", required = false) List<MultipartFile> gallery) throws IOException {
         assetService.updateAsset(assetDTO, file, image, gallery);
         return new ResponseEntity<>(HttpStatus.OK);
     }

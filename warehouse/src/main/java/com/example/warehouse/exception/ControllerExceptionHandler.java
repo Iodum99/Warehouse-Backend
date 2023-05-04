@@ -86,4 +86,21 @@ public class ControllerExceptionHandler {
         return new ErrorMessage(404, new Date(), "Asset not found",
                 ex.getLocalizedMessage());
     }
+
+    @ExceptionHandler(AssetUnsupportedExtensionException.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ErrorMessage AssetUnsupportedExtensionException(AssetUnsupportedExtensionException ex){
+        ex.printStackTrace();
+        String type = ex.getMessage();
+        String supportedTypes = switch (type) {
+            case "OBJECT" -> ".3ds .fbx .obj .dae";
+            case "TEXTURE" -> ".bmp .png .jpg";
+            case "AUDIO" -> ".mp3 .flac .wav";
+            default -> ".fbx .3ds";
+        };
+        return new ErrorMessage(400, new Date(),
+                "Asset does not have supported extension type for " + type + '\n' +
+                "Supported types: " + supportedTypes,
+                ex.getLocalizedMessage());
+    }
 }
