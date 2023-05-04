@@ -35,6 +35,7 @@ public class Asset {
     private List<String> tags;
     @ElementCollection
     private List<String> extensions;
+    private String size;
 
     public Asset(){
         this.uploadDate = LocalDate.now();

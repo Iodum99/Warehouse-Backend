@@ -65,10 +65,23 @@ public class AssetServiceImplementation implements AssetService {
             String assetPath = assetDirectory + "/%s_%s.zip".formatted(author.getUsername(), fileName);
             createAssetDirectory(newAssetDTO.getUserId(), asset.getId());
             Files.write(Path.of(assetPath), file.getBytes());
+            asset.setSize(getFileSize(file.getSize()));
             asset.setFilePath(assetPath);
             asset.setImagePaths(getImagePaths(image, gallery, assetDirectory));
             asset.setAuthor(author.getUsername());
         return modelMapper.map(assetRepository.save(asset), AssetDTO.class);
+    }
+
+    private String getFileSize(long size){
+        String sizeString;
+        if ( size < 1000)
+            sizeString = size + " bytes";
+        else if(size < 1000000)
+            sizeString = size/1000 + " kb";
+        else sizeString = size/1000000 + " Mb";
+
+        return sizeString;
+
     }
 
     private List<String> getExtensions(AssetType type, MultipartFile file) throws IOException {
@@ -160,6 +173,7 @@ public class AssetServiceImplementation implements AssetService {
             String fileName = assetDTO.getName().replaceAll("[^a-zA-Z0-9.-]","");
             String newAssetPath = assetDirectory + "\\%s_%s.zip".formatted(assetDTO.getAuthor(), fileName);
             asset.setExtensions(getExtensions(asset.getAssetType(), file));
+            asset.setSize(getFileSize(file.getSize()));
             renameFileOnAssetUpdate(asset, newAssetPath, file);
             asset.setFilePath(newAssetPath);
         }
