@@ -7,6 +7,7 @@ import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +32,13 @@ public class UserController {
             @RequestPart("user") UserDTO userDTO,
             @RequestPart(value = "image", required = false) MultipartFile image){
         userService.updateUser(userDTO, image);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PutMapping("/disable/{id}")
+    public ResponseEntity<?> disableUser(@PathVariable int id){
+        //TODO: Disable USer
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
