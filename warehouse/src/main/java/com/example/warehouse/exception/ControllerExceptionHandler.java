@@ -38,6 +38,14 @@ public class ControllerExceptionHandler {
                 ex.getLocalizedMessage());
     }
 
+    @ExceptionHandler(UserInvalidPasswordException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorMessage userInvalidPassword(UserInvalidPasswordException ex){
+        ex.printStackTrace();
+        return new ErrorMessage(403, new Date(), "Input Password does not match",
+                ex.getLocalizedMessage());
+    }
+
     // General Exceptions Handling
     @ExceptionHandler(value = {
             HttpServerErrorException.InternalServerError.class,

@@ -50,7 +50,6 @@ public class User {
         this.biography = biography;
         this.interests = interests;
         this.country = country;
-        this.dateOfBirth = dateOfBirth;
         this.avatar = avatar;
         this.enabled = true;
         this.role = role;

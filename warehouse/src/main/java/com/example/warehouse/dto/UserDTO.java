@@ -11,13 +11,13 @@ public class UserDTO {
     private int id;
     private String username;
     private String password;
+    private String newPassword;
     private String email;
     private String name;
     private String surname;
     private String biography;
     private String interests;
     private String country;
-    private LocalDate dateOfBirth;
     private LocalDate joinDate;
     private String avatar;
     private boolean enabled;

@@ -3,6 +3,7 @@ package com.example.warehouse.service.implementation;
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.exception.UserEmailExistsException;
+import com.example.warehouse.exception.UserInvalidPasswordException;
 import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.exception.UserUsernameExistsException;
 import com.example.warehouse.model.Role;
@@ -49,6 +50,7 @@ public class UserServiceImplementation implements UserService {
         newUser.setRole(Role.USER);
         newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
+        newUser.setJoinDate(LocalDate.now());
         User createdUser = userRepository.save(newUser);
         VerificationToken createdToken = verificationTokenRepository.save(new VerificationToken(createdUser.getId()));
         emailService.sendVerificationEmail(newUser.getEmail(), createdToken.getId().toString());
@@ -85,29 +87,32 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void updateUser(UserDTO userDTO, MultipartFile image) {
         User editUser = userRepository.findById(userDTO.getId())
-                .orElseThrow(() -> new UserNotFoundException("User Not Found"));
+                .orElseThrow(() -> new UserNotFoundException("User ID: " + userDTO.getId()));
 
-        editUser.setDateOfBirth(userDTO.getDateOfBirth());
-        editUser.setBiography(userDTO.getBiography());
-        editUser.setInterests(userDTO.getInterests());
-        editUser.setCountry(userDTO.getCountry());
-        editUser.setName(userDTO.getName());
-        editUser.setSurname(userDTO.getSurname());
+        if(passwordEncoder().matches(userDTO.getPassword(), editUser.getPassword())){
 
-        if(!userDTO.getPassword().equals(""))
-            editUser.setPassword(passwordEncoder().encode(userDTO.getPassword()));
+            if(!userDTO.getNewPassword().equals(""))
+                editUser.setPassword(passwordEncoder().encode(userDTO.getNewPassword()));
 
-        try{
-            if(image != null){
-                Files.write(Path.of(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg"), image.getBytes());
-                editUser.setAvatar(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg");
+            editUser.setBiography(userDTO.getBiography());
+            editUser.setInterests(userDTO.getInterests());
+            editUser.setCountry(userDTO.getCountry());
+            editUser.setName(userDTO.getName());
+            editUser.setSurname(userDTO.getSurname());
+
+            try{
+                if(image != null){
+                    Files.write(Path.of(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg"), image.getBytes());
+                    editUser.setAvatar(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg");
+                } else
+                    editUser.setAvatar(null);
+            } catch (Exception e){
+                e.printStackTrace();
             }
+            userRepository.save(editUser);
+        } else throw new UserInvalidPasswordException("Invalid password!");
 
-        } catch (Exception e){
-            e.printStackTrace();
-        }
 
-        userRepository.save(editUser);
     }
 
     @Override
