@@ -36,9 +36,9 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @PutMapping("/disable/{id}")
-    public ResponseEntity<?> disableUser(@PathVariable int id){
-        //TODO: Disable USer
+    @PutMapping("/status/{id}")
+    public ResponseEntity<?> toggleUserStatus(@PathVariable int id){
+        userService.toggleUserStatus(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -47,9 +47,20 @@ public class UserController {
         return new ResponseEntity<>(userService.findUserById(id), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     public ResponseEntity<?> getAllUsers(){
         List<UserDTO> users = userService.findAllUsers();
+        if(!users.isEmpty())
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+    }
+
+    @GetMapping("/enabled")
+    public ResponseEntity<?> getAllEnabledUsers(){
+        List<UserDTO> users = userService.findAllEnabledUsers();
         if(!users.isEmpty())
             return new ResponseEntity<>(users, HttpStatus.OK);
         else
@@ -63,9 +74,4 @@ public class UserController {
        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/enable/{id}")
-    public ResponseEntity<?> enableUser(@PathVariable int id){
-        userService.enableUser(id);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 }

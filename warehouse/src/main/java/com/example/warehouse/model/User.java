@@ -40,7 +40,8 @@ public class User {
                 LocalDate dateOfBirth,
                 String avatar,
                 Role role,
-                LocalDate joinDate
+                LocalDate joinDate,
+                boolean enabled
                 ){
         this.username = username;
         this.password = password;
@@ -51,7 +52,7 @@ public class User {
         this.interests = interests;
         this.country = country;
         this.avatar = avatar;
-        this.enabled = true;
+        this.enabled = enabled;
         this.role = role;
         this.joinDate = joinDate;
     }

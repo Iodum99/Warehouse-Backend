@@ -17,6 +17,8 @@ public interface UserService {
     void updateUser(UserDTO userDTO, MultipartFile image);
     void deleteUser(int id);
     User findUserByUsername(String username);
-    void enableUser(int id);
+    void toggleUserStatus(int id);
+    List<UserDTO> findAllEnabledUsers();
     void initialize();
+
 }

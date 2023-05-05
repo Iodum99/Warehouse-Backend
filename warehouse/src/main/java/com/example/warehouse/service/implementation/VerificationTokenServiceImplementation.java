@@ -30,7 +30,7 @@ public class VerificationTokenServiceImplementation implements VerificationToken
             throw new VerificationTokenExpiredException("TokenId: " + tokenId);
         }
         else {
-            userService.enableUser(token.getUserId());
+            userService.toggleUserStatus(token.getUserId());
             verificationTokenRepository.delete(token);
         }
     }
