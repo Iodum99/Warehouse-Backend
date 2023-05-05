@@ -23,7 +23,6 @@ public class User {
     private String biography;
     private String interests;
     private String country;
-    private LocalDate dateOfBirth;
     private LocalDate joinDate;
     private String avatar;
     private boolean enabled;
@@ -37,7 +36,6 @@ public class User {
                 String biography,
                 String interests,
                 String country,
-                LocalDate dateOfBirth,
                 String avatar,
                 Role role,
                 LocalDate joinDate,

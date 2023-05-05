@@ -33,6 +33,7 @@ import java.util.List;
 public class UserServiceImplementation implements UserService {
 
     private static final String DIRECTORY = "..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\user_id_%d";
+    private static final String DEFAULT_AVATAR = "..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\default_avatar.png";
     public PasswordEncoder passwordEncoder()
     {
         return new BCryptPasswordEncoder();
@@ -51,6 +52,7 @@ public class UserServiceImplementation implements UserService {
         newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
         newUser.setJoinDate(LocalDate.now());
+        newUser.setAvatar(DEFAULT_AVATAR);
         User createdUser = userRepository.save(newUser);
         VerificationToken createdToken = verificationTokenRepository.save(new VerificationToken(createdUser.getId()));
         emailService.sendVerificationEmail(newUser.getEmail(), createdToken.getId().toString());
@@ -99,13 +101,13 @@ public class UserServiceImplementation implements UserService {
             editUser.setCountry(userDTO.getCountry());
             editUser.setName(userDTO.getName());
             editUser.setSurname(userDTO.getSurname());
+            editUser.setAvatar(userDTO.getAvatar());
 
             try{
                 if(image != null){
                     Files.write(Path.of(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg"), image.getBytes());
                     editUser.setAvatar(DIRECTORY.formatted(userDTO.getId()) + "\\avatar.jpg");
-                } else
-                    editUser.setAvatar(null);
+                }
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -144,44 +146,6 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void initialize() {
-        try{
 
-            Files.createDirectories(Path.of("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp"));
-
-            User user1 = new User(
-                    "Iodum",passwordEncoder().encode("ADMINsifra123"), "iodum@admin.com", "Dejan", "Bjelic",
-                    "", "", "Serbia", LocalDate.of(1999, 4, 5),
-                    null,Role.ADMIN, LocalDate.of(2023, 1, 1), true);
-            User user2 = new User(
-                    "Delca",passwordEncoder().encode("USERsifra123"), "delca@gmail.com", "Delca", "Britt",
-                    "I am an introvert boy, born in late 1998! (Lie, I was born befire Christ and dinsaurs were my pets. I am the cause of the Big Bang, oops!)", "Graphics design, binging series, Eurovision and in free time I like to pretend I am the Qeen Elizabeth!",
-                    "France", LocalDate.of(1998, 11, 26),
-                    null,Role.USER, LocalDate.of(2023, 1, 2), true);
-
-            User user3 = new User(
-                    "MarlenaCrystal",passwordEncoder().encode("USERsifra123"), "marlena@gmail.com", "Marlena", "Crystal",
-                    "80s Queen slaying in free time", "Video games, 80s music production",
-                    "Germany", LocalDate.of(1997, 3, 9),
-                    null,Role.USER, LocalDate.of(2023, 1, 2), true);
-
-            User user4 = new User(
-                    "Dermahn",passwordEncoder().encode("USERsifra123"), "dermahn@gmail.com", "Dominik", "Taylor",
-                    "Skater boy and a punk", "Video games, watching series",
-                    "Germany", LocalDate.of(1996, 8, 13),
-                    null,Role.USER, LocalDate.of(2023, 1, 2), false);
-
-            createUserDirectory(1);
-            createUserDirectory(2);
-            createUserDirectory(3);
-            createUserDirectory(4);
-
-            userRepository.save(user1);
-            userRepository.save(user2);
-            userRepository.save(user3);
-            userRepository.save(user4);
-
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 }
