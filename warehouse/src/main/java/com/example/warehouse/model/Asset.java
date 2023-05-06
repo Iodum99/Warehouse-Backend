@@ -36,6 +36,7 @@ public class Asset {
     @ElementCollection
     private List<String> extensions;
     private long size;
+    private int numberOfLikes;
 
     public Asset(){
         this.uploadDate = LocalDate.now();
@@ -43,5 +44,6 @@ public class Asset {
         this.userIdLikes = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.extensions = new ArrayList<>();
+        this.numberOfLikes = 0;
     }
 }

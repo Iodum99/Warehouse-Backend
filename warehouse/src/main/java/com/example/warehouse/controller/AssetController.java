@@ -4,6 +4,7 @@ import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.service.AssetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +53,10 @@ public class AssetController {
     @GetMapping("/user/{id}/type/{type}")
     public ResponseEntity<?> getAllAssetsByUserIdAndAssetType(
             @PathVariable int id,
-            @PathVariable String type){
-        return new ResponseEntity<>(assetService.findAllAssetsByUserIdAndAssetType(id, type), HttpStatus.OK);
+            @PathVariable String type,
+            @Param("sortBy") String sortBy,
+            @Param("sortType") String sortType){
+        return new ResponseEntity<>(assetService.findAllAssetsByUserIdAndAssetType(id, type, sortBy, sortType), HttpStatus.OK);
     }
 
     @GetMapping
@@ -62,8 +65,11 @@ public class AssetController {
     }
 
     @GetMapping("/type/{type}")
-    public ResponseEntity<?> getAllAssetsByType(@PathVariable String type){
-        return new ResponseEntity<>(assetService.findAllAssetsByType(type), HttpStatus.OK);
+    public ResponseEntity<?> getAllAssetsByType(
+            @PathVariable String type,
+            @Param("sortBy") String sortBy,
+            @Param("sortType") String sortType){
+        return new ResponseEntity<>(assetService.findAllAssetsByType(type, sortBy, sortType), HttpStatus.OK);
     }
 
     @PutMapping("/downloads/{id}")

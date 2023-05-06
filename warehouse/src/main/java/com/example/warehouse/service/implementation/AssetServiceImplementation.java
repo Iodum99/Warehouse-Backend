@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,7 +76,7 @@ public class AssetServiceImplementation implements AssetService {
 
         Path path = Path.of("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp\\temp.zip");
         Files.write(path, file.getBytes());
-        List<String> extensions = readExtensionsFromZippedFile("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp\\temp.zip");
+        List<String> extensions = readExtensionsFromZippedFile();
         List<String> validExtensions = new ArrayList<>();
             //Check if found extension matches supported for required asset type
             List<String> supportedExtensions = SUPPORTED_EXTENSIONS.get(type);
@@ -91,11 +92,11 @@ public class AssetServiceImplementation implements AssetService {
         return validExtensions;
     }
 
-    private List<String> readExtensionsFromZippedFile(String filepath) throws IOException {
+    private List<String> readExtensionsFromZippedFile() throws IOException {
 
         List<String> extensions = new ArrayList<>();
         Set<String> set = new HashSet<>(extensions);
-        File asset = new File(filepath);
+        File asset = new File("..\\..\\Warehouse-Frontend\\warehouse\\src\\assets\\temp\\temp.zip");
         InputStream in = new FileInputStream(asset);
         ZipInputStream zis = new ZipInputStream(in);
         ZipEntry entry;
@@ -155,6 +156,7 @@ public class AssetServiceImplementation implements AssetService {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Asset asset = modelMapper.map(assetDTO, Asset.class);
         asset.setLastModifiedDate(LocalDate.now());
+        asset.setNumberOfLikes(asset.getUserIdLikes().size());
         String assetDirectory = DIRECTORY.formatted(asset.getUserId(), asset.getId());
         if(file != null){
             String fileName = assetDTO.getName().replaceAll("[^a-zA-Z0-9.-]","");
@@ -217,23 +219,24 @@ public class AssetServiceImplementation implements AssetService {
     @Override
     public List<AssetDTO> findAllAssets() {
         return modelMapper
-                .map(assetRepository.findAll(), new TypeToken<List<AssetDTO>>(){}.getType());
+                .map(assetRepository.findAll(Sort.by("upload_date")), new TypeToken<List<AssetDTO>>(){}.getType());
     }
 
     @Override
-    public List<AssetDTO> findAllAssetsByUserIdAndAssetType(int userId, String type) {
+    public List<AssetDTO> findAllAssetsByUserIdAndAssetType(int userId, String type, String sortBy, String sortType ) {
         return modelMapper
-                .map(assetRepository.findAllByUserIdAndAssetType(userId, AssetType.valueOf(type.toUpperCase())),
+                .map(assetRepository.findAllByUserIdAndAssetType(userId, AssetType.valueOf(type.toUpperCase()),
+                            Sort.by(Sort.Direction.valueOf(sortType),sortBy)),
                         new TypeToken<List<AssetDTO>>(){}.getType());
     }
 
     @Override
-    public List<AssetDTO> findAllAssetsByType(String type) {
+    public List<AssetDTO> findAllAssetsByType(String type, String sortBy, String sortType) {
        return modelMapper
-                .map(assetRepository.findAllByAssetType(AssetType.valueOf(type.toUpperCase())),
+                .map(assetRepository.findAllByAssetType(AssetType.valueOf(type.toUpperCase()),
+                                Sort.by(Sort.Direction.valueOf(sortType),sortBy)),
                         new TypeToken<List<AssetDTO>>(){}.getType());
     }
-
     @Override
     public void increaseDownloadsCount(int id) {
         Asset asset = assetRepository.findById(id)
@@ -251,6 +254,7 @@ public class AssetServiceImplementation implements AssetService {
             asset.getUserIdLikes().remove((Integer) userId);
         else
             asset.getUserIdLikes().add(userId);
+        asset.setNumberOfLikes(asset.getUserIdLikes().size());
         assetRepository.save(asset);
     }
 

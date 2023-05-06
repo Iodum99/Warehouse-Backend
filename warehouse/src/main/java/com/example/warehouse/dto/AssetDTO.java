@@ -24,4 +24,5 @@ public class AssetDTO {
     private List<String> tags;
     private List<String> extensions;
     private long size;
+    private int numberOfLikes;
 }
