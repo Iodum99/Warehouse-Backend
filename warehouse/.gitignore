@@ -32,3 +32,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### SQL Dummy Data ###
+src/main/resources/import.sql

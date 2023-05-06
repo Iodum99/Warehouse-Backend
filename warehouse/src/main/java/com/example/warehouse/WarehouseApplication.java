@@ -9,9 +9,6 @@ import org.springframework.context.ApplicationContext;
 public class WarehouseApplication {
 
     public static void main(String[] args) {
-        ApplicationContext ctx = SpringApplication.run(WarehouseApplication.class, args);
-        UserService userService = ctx.getBean(UserService.class);
-        userService.initialize();
+        SpringApplication.run(WarehouseApplication.class, args);
     }
-
 }

@@ -19,6 +19,4 @@ public interface UserService {
     User findUserByUsername(String username);
     void toggleUserStatus(int id);
     List<UserDTO> findAllEnabledUsers();
-    void initialize();
-
 }

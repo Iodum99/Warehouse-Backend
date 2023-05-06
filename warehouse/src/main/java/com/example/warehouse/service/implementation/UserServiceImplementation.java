@@ -144,8 +144,4 @@ public class UserServiceImplementation implements UserService {
         return modelMapper.map(userRepository.findAllEnabledUsers(), new TypeToken<List<UserDTO>>(){}.getType());
     }
 
-    @Override
-    public void initialize() {
-
-    }
 }
