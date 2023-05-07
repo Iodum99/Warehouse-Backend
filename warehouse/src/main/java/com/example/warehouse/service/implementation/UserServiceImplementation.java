@@ -17,6 +17,7 @@ import jakarta.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -140,8 +141,9 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public List<UserDTO> findAllEnabledUsers() {
-        return modelMapper.map(userRepository.findAllEnabledUsers(), new TypeToken<List<UserDTO>>(){}.getType());
+    public List<UserDTO> findAllEnabledUsers(String sortBy, String sortType) {
+        return modelMapper.map(userRepository.findAllEnabledUsers(Sort.by(Sort.Direction.valueOf(sortType), sortBy )),
+                new TypeToken<List<UserDTO>>(){}.getType());
     }
 
 }

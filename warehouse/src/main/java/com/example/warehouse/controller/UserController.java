@@ -4,6 +4,7 @@ import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.service.UserService;
 import jakarta.mail.MessagingException;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,8 +60,11 @@ public class UserController {
     }
 
     @GetMapping("/enabled")
-    public ResponseEntity<?> getAllEnabledUsers(){
-        List<UserDTO> users = userService.findAllEnabledUsers();
+    public ResponseEntity<?> getAllEnabledUsers(
+            @PathParam(value = "sortBy") String sortBy,
+            @PathParam(value = "SortType") String sortType
+    ){
+        List<UserDTO> users = userService.findAllEnabledUsers(sortBy, sortType);
         if(!users.isEmpty())
             return new ResponseEntity<>(users, HttpStatus.OK);
         else

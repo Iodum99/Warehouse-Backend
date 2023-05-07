@@ -18,5 +18,5 @@ public interface UserService {
     void deleteUser(int id);
     User findUserByUsername(String username);
     void toggleUserStatus(int id);
-    List<UserDTO> findAllEnabledUsers();
+    List<UserDTO> findAllEnabledUsers(String sortBy, String sortType);
 }
