@@ -3,6 +3,7 @@ package com.example.warehouse.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Formula;
 
 import java.time.LocalDate;
 
@@ -28,31 +29,7 @@ public class User {
     private boolean enabled;
     private Role role;
 
-    public User(String username,
-                String password,
-                String email,
-                String name,
-                String surname,
-                String biography,
-                String interests,
-                String country,
-                String avatar,
-                Role role,
-                LocalDate joinDate,
-                boolean enabled
-                ){
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.name = name;
-        this.surname = surname;
-        this.biography = biography;
-        this.interests = interests;
-        this.country = country;
-        this.avatar = avatar;
-        this.enabled = enabled;
-        this.role = role;
-        this.joinDate = joinDate;
-    }
-
+    @JoinTable(name = "asset_table")
+    @Formula(value = "(SELECT COUNT(*) FROM asset_table a WHERE a.user_id=id)")
+    private int numberOfAssets;
 }

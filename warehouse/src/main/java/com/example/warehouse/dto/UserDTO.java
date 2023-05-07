@@ -22,4 +22,5 @@ public class UserDTO {
     private String avatar;
     private boolean enabled;
     private Role role;
+    private int numberOfAssets;
 }

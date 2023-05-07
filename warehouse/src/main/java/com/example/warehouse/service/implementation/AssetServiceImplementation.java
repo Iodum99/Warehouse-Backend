@@ -156,7 +156,6 @@ public class AssetServiceImplementation implements AssetService {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         Asset asset = modelMapper.map(assetDTO, Asset.class);
         asset.setLastModifiedDate(LocalDate.now());
-        asset.setNumberOfLikes(asset.getUserIdLikes().size());
         String assetDirectory = DIRECTORY.formatted(asset.getUserId(), asset.getId());
         if(file != null){
             String fileName = assetDTO.getName().replaceAll("[^a-zA-Z0-9.-]","");
