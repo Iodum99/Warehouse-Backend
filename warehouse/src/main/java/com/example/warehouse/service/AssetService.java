@@ -4,7 +4,7 @@ import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.FilterDataDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.model.AssetType;
-import com.example.warehouse.model.helper.AssetSpecification;
+import com.example.warehouse.model.helper.AssetSearchRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,12 +16,11 @@ public interface AssetService {
     AssetDTO findAssetById(int id);
     void updateAsset(AssetDTO asset, MultipartFile file, MultipartFile image, List<MultipartFile> gallery) throws IOException;
     void deleteAsset(int id);
-    List<AssetDTO> findAllAssets();
-    List<AssetDTO> findAllAssetsByUserIdAndAssetType(int id, String assetType, String sortBy, String sortType);
-    List<AssetDTO> findAllAssets(AssetSpecification assetSpecification);
+    List<AssetDTO> findAllAssets(AssetSearchRequest assetSearchRequest);
     void increaseDownloadsCount(int id);
     void manageLikes(int assetId, int userId);
     List<AssetDTO> findFavoritesByUserId(int userId);
     FilterDataDTO findAllAssetTagsAndExtensions(AssetType assetType);
+    FilterDataDTO findAllAssetTagsAndExtensionsByUser(AssetType assetType, int userId);
 
 }

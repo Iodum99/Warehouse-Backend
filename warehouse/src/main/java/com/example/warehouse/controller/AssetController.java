@@ -3,7 +3,7 @@ package com.example.warehouse.controller;
 import com.example.warehouse.dto.AssetDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.model.AssetType;
-import com.example.warehouse.model.helper.AssetSpecification;
+import com.example.warehouse.model.helper.AssetSearchRequest;
 import com.example.warehouse.service.AssetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -52,30 +52,18 @@ public class AssetController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/user/{id}/type/{type}")
-    public ResponseEntity<?> getAllAssetsByUserIdAndAssetType(
-            @PathVariable int id,
-            @PathVariable String type,
-            @Param("sortBy") String sortBy,
-            @Param("sortType") String sortType){
-        return new ResponseEntity<>(assetService.findAllAssetsByUserIdAndAssetType(id, type, sortBy, sortType), HttpStatus.OK);
-    }
-
-    @GetMapping
-    public ResponseEntity<?> getAllAssets(){
-        return new ResponseEntity<>(assetService.findAllAssets(), HttpStatus.OK);
-    }
-
-    @GetMapping("/type")
-    public ResponseEntity<?> getAllAssetsByType(
-            @RequestParam ("type") String type,
+    @GetMapping()
+    public ResponseEntity<?> getAllAssets(
+            @RequestParam(value = "userId", required = false) int id,
+            @RequestParam("type") String type,
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortDirection") String sortDirection,
             @RequestParam(value = "filterByText", required = false) String text,
-            @RequestParam(value = "filterByExtensions", required = false) List<String> extensions
+            @RequestParam(value = "filterByExtensions", required = false) List<String> extensions,
+            @RequestParam(value = "filterByTags", required = false) List<String> tags
             ){
         return new ResponseEntity<>(assetService.findAllAssets(
-                new AssetSpecification(type, sortBy, sortDirection, text, null, null)), HttpStatus.OK);
+                new AssetSearchRequest(id, type, sortBy, sortDirection, text, extensions, tags)), HttpStatus.OK);
     }
 
     @PutMapping("/downloads/{id}")
@@ -98,8 +86,17 @@ public class AssetController {
     }
 
     @GetMapping("/filterdata/{type}")
-    public ResponseEntity<?> getFavoritesByUserId(@PathVariable String type){
+    public ResponseEntity<?> getTagsAndExtensions(@PathVariable String type){
         return new ResponseEntity<>(assetService.findAllAssetTagsAndExtensions
                 (AssetType.valueOf(type.toUpperCase())), HttpStatus.OK);
     }
+
+    @GetMapping("/filterdata/{type}/user/{id}")
+    public ResponseEntity<?> getTagsAndExtensions(
+            @PathVariable String type,
+            @PathVariable int id){
+        return new ResponseEntity<>(assetService.findAllAssetTagsAndExtensionsByUser
+                (AssetType.valueOf(type.toUpperCase()), id), HttpStatus.OK);
+    }
+
 }

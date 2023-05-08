@@ -9,16 +9,12 @@ import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
 import com.example.warehouse.model.AssetType;
 import com.example.warehouse.model.User;
-import com.example.warehouse.model.helper.AssetSpecification;
+import com.example.warehouse.model.helper.AssetSearchRequest;
 import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.AssetService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -224,28 +220,11 @@ public class AssetServiceImplementation implements AssetService {
         }
         */
     }
-
     @Override
-    public List<AssetDTO> findAllAssets() {
-        return modelMapper
-                .map(assetRepository.findAll(Sort.by("upload_date")), new TypeToken<List<AssetDTO>>(){}.getType());
-    }
-
-    @Override
-    public List<AssetDTO> findAllAssetsByUserIdAndAssetType(int userId, String type, String sortBy, String sortType ) {
-        return modelMapper
-                .map(assetRepository.findAllByUserIdAndAssetType(userId, AssetType.valueOf(type.toUpperCase()),
-                            Sort.by(Sort.Direction.valueOf(sortType),sortBy)),
-                        new TypeToken<List<AssetDTO>>(){}.getType());
-    }
-
-    @Override
-    public List<AssetDTO> findAllAssets(AssetSpecification specification)
+    public List<AssetDTO> findAllAssets(AssetSearchRequest searchRequest)
     {
-        
-       return modelMapper
-                .map(assetRepository.findAllAssets(specification,Sort.by(specification.getSortDirection(), specification.getSortBy())),
-                        new TypeToken<List<AssetDTO>>(){}.getType());
+        return modelMapper.map(assetRepository.findAll(getSpecification(searchRequest)),
+                new TypeToken<List<AssetDTO>>(){}.getType());
     }
     @Override
     public void increaseDownloadsCount(int id) {
@@ -280,6 +259,46 @@ public class AssetServiceImplementation implements AssetService {
         List<String> tags = assetRepository.findTags(assetType);
         List<String> extensions = assetRepository.findExtensions(assetType);
         return new FilterDataDTO(tags, extensions);
+    }
+
+    @Override
+    public FilterDataDTO findAllAssetTagsAndExtensionsByUser(AssetType assetType, int userId) {
+        List<String> tags = assetRepository.findTagsByUser(assetType, userId);
+        List<String> extensions = assetRepository.findExtensionsByUser(assetType, userId);
+        return new FilterDataDTO(tags, extensions);
+    }
+
+    private Specification<Asset> getSpecification(AssetSearchRequest searchRequest){
+        return (root, cq, cb) -> {
+            Predicate p = cb.conjunction();
+            p = cb.and(p, cb.equal(root.get("assetType"), searchRequest.getType()));
+
+            if(searchRequest.getUserId() != 0)
+                p = cb.and(p, cb.equal(root.get("userId"), searchRequest.getUserId()));
+
+            if(searchRequest.getFilterText() != null){
+                p = cb.and(p, cb.like(cb.lower(root.get("name")),"%" + searchRequest.getFilterText().toLowerCase() + "%"));
+                p = cb.or(p, cb.like(cb.lower(root.get("description")), "%" + searchRequest.getFilterText().toLowerCase() + "%"));
+            }
+
+            if(searchRequest.getFilterExtensions() != null){
+                for(String extension: searchRequest.getFilterExtensions())
+                    p = cb.and(p, cb.isMember(extension, root.get("extensions")));
+            }
+
+            if(searchRequest.getFilterTags() != null){
+                for(String tag: searchRequest.getFilterTags())
+                    p = cb.and(p, cb.isMember(tag, root.get("tags")));
+            }
+
+            if(searchRequest.getSortDirection() == Sort.Direction.DESC)
+                cq.orderBy(cb.desc(root.get(searchRequest.getSortBy())));
+            else
+                cq.orderBy(cb.asc(root.get(searchRequest.getSortBy())));
+            return p;
+        };
+
+
     }
 
 }
