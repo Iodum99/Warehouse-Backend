@@ -1,7 +1,10 @@
 package com.example.warehouse.service;
 
 import com.example.warehouse.dto.AssetDTO;
+import com.example.warehouse.dto.FilterDataDTO;
 import com.example.warehouse.dto.NewAssetDTO;
+import com.example.warehouse.model.AssetType;
+import com.example.warehouse.model.helper.AssetSpecification;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -15,9 +18,10 @@ public interface AssetService {
     void deleteAsset(int id);
     List<AssetDTO> findAllAssets();
     List<AssetDTO> findAllAssetsByUserIdAndAssetType(int id, String assetType, String sortBy, String sortType);
-    List<AssetDTO> findAllAssetsByType(String type, String sortBy, String sortType);
+    List<AssetDTO> findAllAssets(AssetSpecification assetSpecification);
     void increaseDownloadsCount(int id);
     void manageLikes(int assetId, int userId);
     List<AssetDTO> findFavoritesByUserId(int userId);
+    FilterDataDTO findAllAssetTagsAndExtensions(AssetType assetType);
 
 }

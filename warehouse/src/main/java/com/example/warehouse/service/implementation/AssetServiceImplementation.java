@@ -1,6 +1,7 @@
 package com.example.warehouse.service.implementation;
 
 import com.example.warehouse.dto.AssetDTO;
+import com.example.warehouse.dto.FilterDataDTO;
 import com.example.warehouse.dto.NewAssetDTO;
 import com.example.warehouse.exception.AssetNotFoundException;
 import com.example.warehouse.exception.AssetUnsupportedExtensionException;
@@ -8,14 +9,22 @@ import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.model.Asset;
 import com.example.warehouse.model.AssetType;
 import com.example.warehouse.model.User;
+import com.example.warehouse.model.helper.AssetSpecification;
 import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.AssetService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +47,7 @@ public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
     private final UserRepository userRepository;
+    private final EntityManager em;
     private static final Map<AssetType, List<String>> SUPPORTED_EXTENSIONS = createMap();
     private static Map<AssetType, List<String>> createMap() {
         return Map.of(
@@ -230,10 +240,11 @@ public class AssetServiceImplementation implements AssetService {
     }
 
     @Override
-    public List<AssetDTO> findAllAssetsByType(String type, String sortBy, String sortType) {
+    public List<AssetDTO> findAllAssets(AssetSpecification specification)
+    {
+        
        return modelMapper
-                .map(assetRepository.findAllByAssetType(AssetType.valueOf(type.toUpperCase()),
-                                Sort.by(Sort.Direction.valueOf(sortType),sortBy)),
+                .map(assetRepository.findAllAssets(specification,Sort.by(specification.getSortDirection(), specification.getSortBy())),
                         new TypeToken<List<AssetDTO>>(){}.getType());
     }
     @Override
@@ -263,4 +274,12 @@ public class AssetServiceImplementation implements AssetService {
                 .map(assetRepository.findFavoritesByUserId(userId),
                         new TypeToken<List<AssetDTO>>(){}.getType());
     }
+
+    @Override
+    public FilterDataDTO findAllAssetTagsAndExtensions(AssetType assetType) {
+        List<String> tags = assetRepository.findTags(assetType);
+        List<String> extensions = assetRepository.findExtensions(assetType);
+        return new FilterDataDTO(tags, extensions);
+    }
+
 }
