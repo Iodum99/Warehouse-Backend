@@ -207,18 +207,9 @@ public class AssetServiceImplementation implements AssetService {
 
     @Override
     public void deleteAsset(int id) {
-        Asset asset = assetRepository.findById(id).orElseThrow(() -> new AssetNotFoundException("AssetId: " + id));
-       /*
-        try {
-            Files.deleteIfExists(Path.of(asset.getFilePath()));
-            for(String path: asset.getImagePaths())
-                Files.deleteIfExists(Path.of(path));
-            Files.deleteIfExists(Path.of(DIRECTORY.formatted(asset.getUserId(), asset.getId())));
-            assetRepository.deleteById(id);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        */
+        if(assetRepository.existsById(id))
+         assetRepository.deleteById(id);
+        else throw new AssetNotFoundException("Id: " + id);
     }
     @Override
     public List<AssetDTO> findAllAssets(AssetSearchRequest searchRequest)
