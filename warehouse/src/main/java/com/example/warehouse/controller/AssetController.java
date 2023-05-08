@@ -106,7 +106,7 @@ public class AssetController {
 
     @GetMapping("/recent")
     public ResponseEntity<?> getMostRecentAssets(){
-        return new ResponseEntity<>(assetService.findPopularItems(), HttpStatus.OK);
+        return new ResponseEntity<>(assetService.findMostRecentItems(), HttpStatus.OK);
     }
 
 }

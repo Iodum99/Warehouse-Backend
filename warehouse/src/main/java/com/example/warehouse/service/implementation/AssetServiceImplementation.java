@@ -271,14 +271,14 @@ public class AssetServiceImplementation implements AssetService {
     @Override
     public List<AssetDTO> findPopularItems() {
 
-        List<Asset> assets = assetRepository.findTop5ByDownloadsGreaterThanEqual(100,
+        List<Asset> assets = assetRepository.findTop4ByDownloadsGreaterThanEqual(100,
                 Sort.by(Sort.Direction.DESC, "uploadDate"));
         return modelMapper.map(assets, new TypeToken<List<AssetDTO>>(){}.getType());
     }
 
     @Override
     public List<AssetDTO> findMostRecentItems() {
-        List<Asset> assets = assetRepository.findTop5ByDownloadsIsNotEmpty(
+        List<Asset> assets = assetRepository.findTop4ByDownloadsGreaterThanEqual(0,
                 Sort.by(Sort.Direction.DESC, "uploadDate"));
         return modelMapper.map(assets, new TypeToken<List<AssetDTO>>(){}.getType());
     }

@@ -32,6 +32,6 @@ public interface AssetRepository extends JpaRepository<Asset, Integer>, JpaSpeci
             " AND :id = a.userId")
     List<String> findTagsByUser(AssetType assetType, int id);
 
-    List<Asset> findTop5ByDownloadsGreaterThanEqual(int downloads, Sort sort);
-    List<Asset> findTop5ByDownloadsIsNotEmpty(Sort sort);
+    List<Asset> findTop4ByDownloadsGreaterThanEqual(int downloads, Sort sort);
+
 }
