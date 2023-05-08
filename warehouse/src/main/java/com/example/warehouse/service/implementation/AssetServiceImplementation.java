@@ -297,8 +297,6 @@ public class AssetServiceImplementation implements AssetService {
                 cq.orderBy(cb.asc(root.get(searchRequest.getSortBy())));
             return p;
         };
-
-
     }
 
 }

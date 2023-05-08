@@ -2,6 +2,7 @@ package com.example.warehouse.controller;
 
 import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
+import com.example.warehouse.model.helper.UserSearchRequest;
 import com.example.warehouse.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.websocket.server.PathParam;
@@ -50,25 +51,23 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
-    public ResponseEntity<?> getAllUsers(){
-        List<UserDTO> users = userService.findAllUsers();
-        if(!users.isEmpty())
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-
+    public ResponseEntity<?> getAllUsers(
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("sortDirection") String sortDirection,
+            @RequestParam(value = "filterByText", required = false) String text
+    ){
+        return new ResponseEntity<>(userService.findAllUsersAdmin(
+                new UserSearchRequest(sortBy, sortDirection, text)), HttpStatus.OK);
     }
 
     @GetMapping("/enabled")
     public ResponseEntity<?> getAllEnabledUsers(
-            @PathParam(value = "sortBy") String sortBy,
-            @PathParam(value = "SortType") String sortType
+            @RequestParam("sortBy") String sortBy,
+            @RequestParam("sortDirection") String sortDirection,
+            @RequestParam(value = "filterByText", required = false) String text
     ){
-        List<UserDTO> users = userService.findAllEnabledUsers(sortBy, sortType);
-        if(!users.isEmpty())
-            return new ResponseEntity<>(users, HttpStatus.OK);
-        else
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(userService.findAllEnabledUsers(
+                new UserSearchRequest(sortBy, sortDirection, text)), HttpStatus.OK);
 
     }
 

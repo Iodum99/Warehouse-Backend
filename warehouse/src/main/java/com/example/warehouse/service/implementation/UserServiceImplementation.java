@@ -6,18 +6,23 @@ import com.example.warehouse.exception.UserEmailExistsException;
 import com.example.warehouse.exception.UserInvalidPasswordException;
 import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.exception.UserUsernameExistsException;
+import com.example.warehouse.model.Asset;
 import com.example.warehouse.model.Role;
 import com.example.warehouse.model.User;
 import com.example.warehouse.model.VerificationToken;
+import com.example.warehouse.model.helper.AssetSearchRequest;
+import com.example.warehouse.model.helper.UserSearchRequest;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.repository.VerificationTokenRepository;
 import com.example.warehouse.service.EmailService;
 import com.example.warehouse.service.UserService;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.servlet.ServletContext;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,8 +88,9 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public List<UserDTO> findAllUsers() {
-        return modelMapper.map(userRepository.findAll(), new TypeToken<List<UserDTO>>(){}.getType());
+    public List<UserDTO> findAllUsersAdmin(UserSearchRequest userSearchRequest) {
+        return modelMapper.map(userRepository.findAll(getSpecification(userSearchRequest, true)),
+                new TypeToken<List<UserDTO>>(){}.getType());
     }
 
     @Override
@@ -141,9 +147,31 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public List<UserDTO> findAllEnabledUsers(String sortBy, String sortType) {
-        return modelMapper.map(userRepository.findAllEnabledUsers(Sort.by(Sort.Direction.valueOf(sortType), sortBy )),
+    public List<UserDTO> findAllEnabledUsers(UserSearchRequest userSearchRequest) {
+        return modelMapper.map(userRepository.findAll(getSpecification(userSearchRequest, false)),
                 new TypeToken<List<UserDTO>>(){}.getType());
+    }
+
+    private Specification<User> getSpecification(UserSearchRequest searchRequest, boolean findAll){
+        return (root, cq, cb) -> {
+            Predicate p = cb.conjunction();
+
+            if(!findAll)
+                p = cb.and(p, cb.equal(root.get("enabled"), true));
+
+            if(searchRequest.getFilterText() != null){
+                p = cb.and(p, cb.like(cb.lower(root.get("username")),"%" + searchRequest.getFilterText().toLowerCase() + "%"));
+                p = cb.or(p, cb.like(cb.lower(root.get("name")), "%" + searchRequest.getFilterText().toLowerCase() + "%"));
+                p = cb.or(p, cb.like(cb.lower(root.get("surname")), "%" + searchRequest.getFilterText().toLowerCase() + "%"));
+                p = cb.or(p, cb.like(cb.lower(root.get("country")), "%" + searchRequest.getFilterText().toLowerCase() + "%"));
+            }
+
+            if(searchRequest.getSortDirection() == Sort.Direction.DESC)
+                cq.orderBy(cb.desc(root.get(searchRequest.getSortBy())));
+            else
+                cq.orderBy(cb.asc(root.get(searchRequest.getSortBy())));
+            return p;
+        };
     }
 
 }
