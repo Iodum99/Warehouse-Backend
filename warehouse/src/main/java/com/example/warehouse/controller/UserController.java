@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping
+    @GetMapping("/admin")
     public ResponseEntity<?> getAllUsers(
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortDirection") String sortDirection,
@@ -60,7 +60,7 @@ public class UserController {
                 new UserSearchRequest(sortBy, sortDirection, text)), HttpStatus.OK);
     }
 
-    @GetMapping("/enabled")
+    @GetMapping
     public ResponseEntity<?> getAllEnabledUsers(
             @RequestParam("sortBy") String sortBy,
             @RequestParam("sortDirection") String sortDirection,
