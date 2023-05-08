@@ -31,4 +31,7 @@ public interface AssetRepository extends JpaRepository<Asset, Integer>, JpaSpeci
     @Query("select DISTINCT a.tags from Asset a where a.assetType = :assetType" +
             " AND :id = a.userId")
     List<String> findTagsByUser(AssetType assetType, int id);
+
+    List<Asset> findTop5ByDownloadsGreaterThanEqual(int downloads, Sort sort);
+    List<Asset> findTop5ByDownloadsIsNotEmpty(Sort sort);
 }

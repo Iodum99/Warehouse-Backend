@@ -268,6 +268,21 @@ public class AssetServiceImplementation implements AssetService {
         return new FilterDataDTO(tags, extensions);
     }
 
+    @Override
+    public List<AssetDTO> findPopularItems() {
+
+        List<Asset> assets = assetRepository.findTop5ByDownloadsGreaterThanEqual(100,
+                Sort.by(Sort.Direction.DESC, "uploadDate"));
+        return modelMapper.map(assets, new TypeToken<List<AssetDTO>>(){}.getType());
+    }
+
+    @Override
+    public List<AssetDTO> findMostRecentItems() {
+        List<Asset> assets = assetRepository.findTop5ByDownloadsIsNotEmpty(
+                Sort.by(Sort.Direction.DESC, "uploadDate"));
+        return modelMapper.map(assets, new TypeToken<List<AssetDTO>>(){}.getType());
+    }
+
     private Specification<Asset> getSpecification(AssetSearchRequest searchRequest){
         return (root, cq, cb) -> {
             Predicate p = cb.conjunction();

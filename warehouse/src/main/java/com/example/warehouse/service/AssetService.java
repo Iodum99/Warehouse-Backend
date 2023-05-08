@@ -22,5 +22,7 @@ public interface AssetService {
     List<AssetDTO> findFavoritesByUserId(int userId);
     FilterDataDTO findAllAssetTagsAndExtensions(AssetType assetType);
     FilterDataDTO findAllAssetTagsAndExtensionsByUser(AssetType assetType, int userId);
+    List<AssetDTO> findPopularItems();
+    List<AssetDTO> findMostRecentItems();
 
 }

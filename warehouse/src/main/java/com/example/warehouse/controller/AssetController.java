@@ -99,4 +99,14 @@ public class AssetController {
                 (AssetType.valueOf(type.toUpperCase()), id), HttpStatus.OK);
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<?> getPopularAssets(){
+        return new ResponseEntity<>(assetService.findPopularItems(), HttpStatus.OK);
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<?> getMostRecentAssets(){
+        return new ResponseEntity<>(assetService.findPopularItems(), HttpStatus.OK);
+    }
+
 }
