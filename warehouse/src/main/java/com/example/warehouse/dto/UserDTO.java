@@ -23,4 +23,5 @@ public class UserDTO {
     private boolean enabled;
     private Role role;
     private int numberOfAssets;
+    private boolean suspended;
 }
