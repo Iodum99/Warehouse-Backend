@@ -16,12 +16,14 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     private String role;
     private boolean enabled;
+    private boolean suspended;
 
-    public CustomUserDetails (String username, String password, String role, boolean enabled){
+    public CustomUserDetails (String username, String password, String role, boolean enabled, boolean suspended){
         this.username = username;
         this.password = password;
         this.role = role;
         this.enabled = enabled;
+        this.suspended = suspended;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !suspended;
     }
 
     @Override

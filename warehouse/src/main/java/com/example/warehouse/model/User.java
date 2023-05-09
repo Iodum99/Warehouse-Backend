@@ -10,7 +10,6 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "user_table")
 @Data
-@NoArgsConstructor
 public class User {
 
     @Id
@@ -28,8 +27,17 @@ public class User {
     private String avatar;
     private boolean enabled;
     private Role role;
+    private boolean suspended;
 
     @JoinTable(name = "asset_table")
     @Formula(value = "(SELECT COUNT(*) FROM asset_table a WHERE a.user_id=id)")
     private int numberOfAssets;
+
+    public User() {
+        this.role = Role.USER;
+        this.enabled = false;
+        this.setJoinDate(LocalDate.now());
+        this.suspended = false;
+    }
 }
+

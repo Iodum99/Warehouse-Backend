@@ -22,7 +22,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getUsername(),
                 user.getPassword(),
                 user.getRole().toString(),
-                user.isEnabled());
+                user.isEnabled(),
+                user.isSuspended());
     }
 }
 

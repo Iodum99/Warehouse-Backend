@@ -2,6 +2,9 @@ package com.example.warehouse.exception;
 
 import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -56,6 +59,31 @@ public class ControllerExceptionHandler {
         ex.printStackTrace();
         return new ErrorMessage(500, new Date(), ex.getMessage(),
                 "Oops! There seems to be an error... Please try again later.");
+    }
+
+    //Authentication Exceptions handling
+    @ExceptionHandler(value = LockedException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorMessage lockedAccountException(Exception ex){
+        ex.printStackTrace();
+        return new ErrorMessage(403, new Date(), "LOCKED",
+                "Your account has been suspended by an administrator.");
+    }
+
+    @ExceptionHandler(value = BadCredentialsException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorMessage badCredentialsException(Exception ex){
+        ex.printStackTrace();
+        return new ErrorMessage(403, new Date(), "BAD_CREDENTIALS",
+                "Invalid username or password");
+    }
+
+    @ExceptionHandler(value = DisabledException.class)
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    public ErrorMessage accountNotVerifiedException(Exception ex){
+        ex.printStackTrace();
+        return new ErrorMessage(403, new Date(), "DISABLED",
+                "Account has not been verified yet");
     }
 
 

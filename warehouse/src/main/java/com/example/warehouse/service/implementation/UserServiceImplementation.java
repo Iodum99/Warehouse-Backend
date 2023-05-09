@@ -54,10 +54,7 @@ public class UserServiceImplementation implements UserService {
     public void createUser(NewUserDTO newUserDTO){
         User newUser = modelMapper.map(newUserDTO, User.class);
         validate(newUser);
-        newUser.setRole(Role.USER);
-        newUser.setEnabled(false);
         newUser.setPassword(passwordEncoder().encode(newUser.getPassword()));
-        newUser.setJoinDate(LocalDate.now());
         newUser.setAvatar(DEFAULT_AVATAR);
         User createdUser = userRepository.save(newUser);
         VerificationToken createdToken = verificationTokenRepository.save(new VerificationToken(createdUser.getId()));
