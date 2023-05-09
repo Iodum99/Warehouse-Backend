@@ -144,6 +144,14 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public void toggleUserSuspension(int id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Id: " + id));
+        if(!user.getRole().toString().equals("ADMIN"))
+            user.setSuspended(!user.isSuspended());
+        userRepository.save(user);
+    }
+
+    @Override
     public List<UserDTO> findAllEnabledUsers(UserSearchRequest userSearchRequest) {
         return modelMapper.map(userRepository.findAll(getSpecification(userSearchRequest, false)),
                 new TypeToken<List<UserDTO>>(){}.getType());

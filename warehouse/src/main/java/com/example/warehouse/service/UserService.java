@@ -19,5 +19,6 @@ public interface UserService {
     void deleteUser(int id);
     User findUserByUsername(String username);
     void toggleUserStatus(int id);
+    void toggleUserSuspension(int id);
     List<UserDTO> findAllEnabledUsers(UserSearchRequest userSearchRequest);
 }

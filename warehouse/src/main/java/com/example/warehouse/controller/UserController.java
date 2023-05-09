@@ -4,16 +4,12 @@ import com.example.warehouse.dto.NewUserDTO;
 import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.model.helper.UserSearchRequest;
 import com.example.warehouse.service.UserService;
-import jakarta.mail.MessagingException;
-import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -39,8 +35,8 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/status/{id}")
-    public ResponseEntity<?> toggleUserStatus(@PathVariable int id){
-        userService.toggleUserStatus(id);
+    public ResponseEntity<?> toggleUserSuspension(@PathVariable int id){
+        userService.toggleUserSuspension(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
