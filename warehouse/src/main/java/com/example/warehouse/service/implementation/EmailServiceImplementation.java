@@ -23,7 +23,7 @@ public class EmailServiceImplementation implements EmailService {
             helper.setTo(email);
             helper.setSubject("Account Verification");
             helper.setFrom(sender);
-            mimeMessage.setContent("http://localhost:4200/verification/token/" + token, "text/html");
+            mimeMessage.setContent("To activate your account, please click on the link below: \n\n http://localhost:4200/verification/token/" + token, "text/html");
             javaMailSender.send(mimeMessage);
         } catch (Exception e){
             e.printStackTrace();
