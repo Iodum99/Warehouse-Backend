@@ -7,7 +7,6 @@ import com.example.warehouse.repository.VerificationTokenRepository;
 import com.example.warehouse.service.UserService;
 import com.example.warehouse.service.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

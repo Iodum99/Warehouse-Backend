@@ -1,6 +1,5 @@
 package com.example.warehouse.security.authentication;
 
-import com.example.warehouse.model.helper.CustomUserDetails;
 import com.example.warehouse.security.util.JwtService;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;

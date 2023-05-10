@@ -14,7 +14,7 @@ import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.service.AssetService;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.*;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -43,7 +43,6 @@ public class AssetServiceImplementation implements AssetService {
 
     private final AssetRepository assetRepository;
     private final UserRepository userRepository;
-    private final EntityManager em;
     private static final Map<AssetType, List<String>> SUPPORTED_EXTENSIONS = createMap();
     private static Map<AssetType, List<String>> createMap() {
         return Map.of(

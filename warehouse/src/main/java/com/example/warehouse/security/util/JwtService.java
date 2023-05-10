@@ -1,7 +1,6 @@
 package com.example.warehouse.security.util;
 
 import com.example.warehouse.model.User;
-import com.example.warehouse.model.helper.CustomUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.Function;
 
 @Service

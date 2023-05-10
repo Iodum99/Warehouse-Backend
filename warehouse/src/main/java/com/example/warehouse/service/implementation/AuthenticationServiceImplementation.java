@@ -7,7 +7,6 @@ import com.example.warehouse.security.util.JwtService;
 import com.example.warehouse.service.AuthenticationService;
 import com.example.warehouse.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;

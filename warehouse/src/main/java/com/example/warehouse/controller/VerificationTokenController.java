@@ -1,6 +1,5 @@
 package com.example.warehouse.controller;
 
-import com.example.warehouse.dto.UserDTO;
 import com.example.warehouse.service.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

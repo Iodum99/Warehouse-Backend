@@ -6,11 +6,8 @@ import com.example.warehouse.exception.UserEmailExistsException;
 import com.example.warehouse.exception.UserInvalidPasswordException;
 import com.example.warehouse.exception.UserNotFoundException;
 import com.example.warehouse.exception.UserUsernameExistsException;
-import com.example.warehouse.model.Asset;
-import com.example.warehouse.model.Role;
 import com.example.warehouse.model.User;
 import com.example.warehouse.model.VerificationToken;
-import com.example.warehouse.model.helper.AssetSearchRequest;
 import com.example.warehouse.model.helper.UserSearchRequest;
 import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
@@ -32,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service

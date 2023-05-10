@@ -9,5 +9,4 @@ import java.util.UUID;
 @Repository
 public interface VerificationTokenRepository extends JpaRepository<VerificationToken, UUID> {
 
-    VerificationToken findByUserId(int id);
 }
