@@ -43,6 +43,7 @@ public class User {
         this.enabled = false;
         this.setJoinDate(LocalDate.now());
         this.suspended = false;
+        this.deleted = false;
     }
 }
 
