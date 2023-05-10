@@ -4,9 +4,13 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 
+@SQLDelete(sql = "UPDATE user_table SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 @Entity
 @Table(name = "user_table")
 @Data
@@ -28,6 +32,7 @@ public class User {
     private boolean enabled;
     private Role role;
     private boolean suspended;
+    private boolean deleted;
 
     @JoinTable(name = "asset_table")
     @Formula(value = "(SELECT COUNT(*) FROM asset_table a WHERE a.user_id=id)")

@@ -3,6 +3,7 @@ package com.example.warehouse.repository;
 import com.example.warehouse.model.Asset;
 import com.example.warehouse.model.AssetType;
 import com.example.warehouse.model.helper.AssetSearchRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -33,5 +34,7 @@ public interface AssetRepository extends JpaRepository<Asset, Integer>, JpaSpeci
     List<String> findTagsByUser(AssetType assetType, int id);
 
     List<Asset> findTop4ByDownloadsGreaterThanEqual(int downloads, Sort sort);
+    @Transactional
+    void deleteAllByUserId(int id);
 
 }

@@ -12,6 +12,7 @@ import com.example.warehouse.model.User;
 import com.example.warehouse.model.VerificationToken;
 import com.example.warehouse.model.helper.AssetSearchRequest;
 import com.example.warehouse.model.helper.UserSearchRequest;
+import com.example.warehouse.repository.AssetRepository;
 import com.example.warehouse.repository.UserRepository;
 import com.example.warehouse.repository.VerificationTokenRepository;
 import com.example.warehouse.service.EmailService;
@@ -47,6 +48,7 @@ public class UserServiceImplementation implements UserService {
     ModelMapper modelMapper = new ModelMapper();
     private final UserRepository userRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final AssetRepository assetRepository;
     private final EmailService emailService;
     private final ServletContext context;
 
@@ -125,6 +127,7 @@ public class UserServiceImplementation implements UserService {
     public void deleteUser(int id) {
         if(userRepository.existsById(id)){
             userRepository.deleteById(id);
+            assetRepository.deleteAllByUserId(id);
         }
         else throw new UserNotFoundException("Id: " + id);
     }
